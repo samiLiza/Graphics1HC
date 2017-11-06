@@ -108,21 +108,38 @@ void MeshModel::loadFile(string fileName)
 	//Then vertex_positions should contain:
 	//vertex_positions={v1,v2,v3,v1,v3,v4}
 	int n = faces.size();
-	vertex_positions = new vec3[n]; /*BUG?*/
+	//vertex_positions = new vec3[n]; /*BUG?*/
 	// iterate through all stored faces and create triangles
 	int k=0;
 	for (vector<FaceIdcs>::iterator it = faces.begin(); it != faces.end(); ++it)
 	{
 		for (int i = 0; i < 3; i++)
 		{
-			vertex_positions[k++] = vertices[it->v[i]]; /*BUG*/
+			vertex_positions.push_back(vertices[it->v[i]]); /*BUG?*/
 		}
 	}
 }
 
 
 
-void MeshModel::draw()
+void MeshModel::draw(const Renderer& rend)
 {
-	
+	// ToDo: think about normal
+	rend.DrawTriangles(&vertex_positions);
+}
+
+void MeshModel::addWorldTransform(const mat4& transform) 
+{
+	_worldTransform *= transform;
+}
+
+void MeshModel::addNormalTransform(const mat3& transform)
+{
+	_normalTransform *= transform;
+}
+
+
+void MeshModel::addModelTransform(const mat4& transform)
+{
+	_modelTransform *= transform;
 }
