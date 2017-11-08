@@ -3,6 +3,7 @@
 #include "CG_skel_w_MFC.h"
 #include "InitShader.h"
 #include "GL\freeglut.h"
+#include "assert.h"
 
 #define INDEX(width,x,y,c) (x+y*width)*3+c
 
@@ -54,6 +55,12 @@ void Renderer::SetDemoBuffer()
 void Renderer::DrawTriangles(const vector<vec3>* vertices, const vector<vec3>* normals) const 
 {
 
+}
+
+void Renderer::setCamera(Camera* camera) 
+{
+	assert(camera);
+	this->activeCamera = camera;
 }
 
 

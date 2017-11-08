@@ -4,6 +4,8 @@
 #include "vec.h"
 #include "mat.h"
 #include "GL/glew.h"
+#include "Camera.h"
+
 
 using namespace std;
 class Renderer
@@ -11,6 +13,8 @@ class Renderer
 	float *m_outBuffer; // 3*width*height
 	float *m_zbuffer; // width*height
 	int m_width, m_height;
+
+	Camera* activeCamera;
 
 	void CreateBuffers(int width, int height);
 	void CreateLocalBuffer();
@@ -36,5 +40,7 @@ public:
 	void ClearColorBuffer();
 	void ClearDepthBuffer();
 	void SetDemoBuffer();
+
 	void DrawLine(int x0, int y0, int x1, int y1 /* Pixels to fill ?*/);
+	void setCamera(Camera* camera);
 };
