@@ -24,4 +24,24 @@ public:
 		this->x = x;
 		this->y = y;
 	}
+
+	int X() const{
+		return x;
+	}
+
+	int Y() const {
+		return y;
+	}
+
+	int red() const {
+		return rgb[0];
+	}
+
+	int green() const {
+		return rgb[1];
+	}
+
+	int blue() const {
+		return rgb[2];
+	}
 };

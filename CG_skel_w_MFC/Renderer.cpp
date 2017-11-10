@@ -40,28 +40,48 @@ void Renderer::SetDemoBuffer()
 		m_outBuffer[INDEX(m_width,256,i,0)]=1;	m_outBuffer[INDEX(m_width,256,i,1)]=0;	m_outBuffer[INDEX(m_width,256,i,2)]=0;
 
 	}
-	DrawLine(511, 511, 0, 0);
-	DrawLine(0, 511, 511, 0);
-	//DrawLinePosSlope(300, 200, 0, 0);
-	//DrawLinePosSlope(0, 400, 280, 280);
-	//horizontal line
+	//DrawLine(511, 511, 0, 0);
+	//DrawLine(0, 511, 511, 0);
 	for(int i=0; i<m_width; i++)
 	{
 		m_outBuffer[INDEX(m_width,i,256,0)]=1;	m_outBuffer[INDEX(m_width,i,256,1)]=0;	m_outBuffer[INDEX(m_width,i,256,2)]=1;
 
 	}
+
+	vector<vec3> vertices;
+
+	vertices.push_back(vec3(200, 200, 0));
+	vertices.push_back(vec3(256, 256, 10));
+	vertices.push_back(vec3(400, 300, -3));
+	DrawTriangles(&vertices);
 }
 
 void Renderer::DrawTriangles(const vector<vec3>* vertices, const vector<vec3>* normals) const 
 {
+	for (int i = 0; i < vertices->size(); i += 3) {
+		vec4 p1 = applyTrasformations(vertices->at(i));
+		vec4 p2 = applyTrasformations(vertices->at(i+1));
+		vec4 p3 = applyTrasformations(vertices->at(i+2));
+		viewPort(p1);
+		viewPort(p2);
+		viewPort(p3);
+		vector<Pixel> pixels;
+		DrawLine(p1.x, p1.y, p2.x, p2.y, pixels);
+		DrawLine(p1.x, p1.y, p3.x, p3.y, pixels);
+		DrawLine(p2.x, p2.y, p3.x, p3.y, pixels);
+		setPixels(pixels);
+
+
+
+	}
 
 }
 
-void Renderer::setCamera(Camera* camera) 
-{
-	assert(camera);
-	this->activeCamera = camera;
-}
+//void Renderer::setCamera(Camera* camera) 
+//{
+	//assert(camera);
+	//this->activeCamera = camera;
+//}
 
 
 
@@ -144,7 +164,7 @@ void Renderer::SwapBuffers()
 	a = glGetError();
 }
 
-void Renderer::DrawLine(int x0, int y0, int x1, int y1 /* Pixels to fill ?*/)
+void Renderer::DrawLine(int x0, int y0, int x1, int y1, vector<Pixel>& pixels /* Pixels to fill ?*/) const
 {
 	// assert: y0 > y1
 	if (x0 > x1)
@@ -177,24 +197,69 @@ void Renderer::DrawLine(int x0, int y0, int x1, int y1 /* Pixels to fill ?*/)
 
 	int realY = 0;
 	int currY = y0;
+	Pixel p;
 	for (int currX = x0; currX <= x1; currX++)
 	{
 		// do smth with pixel
 		if (mirrored) 
 		{
-			m_outBuffer[INDEX(m_width, currY, currX, 0)] = 1;	m_outBuffer[INDEX(m_width, currY, currX, 1)] = 1;	m_outBuffer[INDEX(m_width, currY, currX, 2)] = 0;
+			//m_outBuffer[INDEX(m_width, currY, currX, 0)] = 1;	m_outBuffer[INDEX(m_width, currY, currX, 1)] = 1;	m_outBuffer[INDEX(m_width, currY, currX, 2)] = 0;
+			p.setCordinates(currY, currX);
 		} 
 		else 
 		{
-			m_outBuffer[INDEX(m_width, currX, currY, 0)] = 1;	m_outBuffer[INDEX(m_width, currX, currY, 1)] = 1;	m_outBuffer[INDEX(m_width, currX, currY, 2)] = 0;
+			//m_outBuffer[INDEX(m_width, currX, currY, 0)] = 1;	m_outBuffer[INDEX(m_width, currX, currY, 1)] = 1;	m_outBuffer[INDEX(m_width, currX, currY, 2)] = 0;
+			p.setCordinates(currX, currY);
 		}
 		
+		p.setColor(1, 1, 0); // The colors are random
+
 		realY += delta;
 		if (realY >= threshold)
 		{
 			currY+=yInc;
 			threshold += threshInc;
 		}
+		pixels.push_back(p);
 	}
 
+}
+
+void Renderer::viewPort(vec4& p) const {
+	p.x = (m_width / 2)*(p.x + 1);
+	p.y = (m_height / 2)*(p.y + 1);
+}
+
+vec4 Renderer::applyTrasformations(const vec3& p) const {
+	vec4 homog(p);
+	homog = mTransform*homog; //model
+	homog = wTransform*homog; //world
+	homog = cTransform*homog; //camera
+	homog = projection*homog; //camera
+	if(homog.w != 0)
+		homog /= homog.w;
+
+	return homog;
+
+}
+
+void Renderer::setPixels(vector<Pixel> pixels) const {
+	for (Pixel p : pixels) {
+		m_outBuffer[INDEX(m_width, p.X(), p.Y(), 0)] = p.red();
+		m_outBuffer[INDEX(m_width, p.X(), p.Y(), 1)] = p.green();
+		m_outBuffer[INDEX(m_width, p.X(), p.Y(), 2)] = p.blue();
+	}
+}
+
+void Renderer::SetCameraTransform(const mat4& cTransform) {
+	this->cTransform = cTransform;
+}
+
+void Renderer::SetProjection(const mat4& projection) {
+	this->projection = projection;
+}
+
+void Renderer::SetObjectMatrices(const mat4& mTransform, mat4& wTransform, mat3& nTransform) {
+	this->mTransform = mTransform;
+	this->wTransform = wTransform;
 }

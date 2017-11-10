@@ -37,9 +37,10 @@ bool lb_down,rb_down,mb_down;
 //----------------------------------------------------------------------------
 // Callbacks
 
-void display( void )
+void display()
 {
 //Call the scene and ask it to draw itself
+	scene->draw();
 }
 
 void reshape( int width, int height )
@@ -179,22 +180,6 @@ using namespace std;
 int main( int argc, char **argv )
 {
 	int nRetCode = 0;
-	mat4 m = mat4(1, 2, 3, 4, 5, 6, 7 , 8 , 9, 10 , 1.1, 1.2, 1.3, 1.4, 1.5, 1.6);
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
-			cout << m[i][j];
-		}
-		cout << endl;
-	}
-	cout << endl;
-	mat4 t = transpose(m);
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
-			cout << t[i][j];
-		}
-		cout << endl;
-	}
-	cout << endl;
 	
 	// initialize MFC and print and error on failure
 	if (!AfxWinInit(::GetModuleHandle(NULL), NULL, ::GetCommandLine(), 0))
