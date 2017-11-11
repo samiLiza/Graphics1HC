@@ -9,7 +9,7 @@ void Scene::loadOBJModel(string fileName)
 	MeshModel *model = new MeshModel(fileName);
 	models.push_back(model);
 	if (cameras.empty()) {
-		addCamera(ORTHOGONAL);
+		addCamera(PERSPECTIVE);
 		activeCamera = 0;
 	}
 	activeModel = models.size() - 1;
@@ -51,6 +51,7 @@ void Scene::addCamera(CameraType type)
 	{
 		cam = new PerspectiveCamera();
 	}
+
 	cam->setCameraParams(-1, 1, -1, 1, -1, 1);
 	cam->LookAt(vec4(0, 0, 0, 0), vec4(0, 0, -1, 0), vec4(0, 1, 0, 0));
 	cameras.push_back(cam);

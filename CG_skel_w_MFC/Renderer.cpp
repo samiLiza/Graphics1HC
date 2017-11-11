@@ -32,6 +32,18 @@ void Renderer::CreateBuffers(int width, int height)
 	m_outBuffer = new float[3*m_width*m_height];
 }
 
+void Renderer::ClearColorBuffer() {
+	for (int i = 0; i < 3 * m_width*m_height; i++) {
+		m_outBuffer[i] = 0;
+	}
+}
+
+void Renderer::ClearDepthBuffer() {
+	for (int i = 0; i < m_width*m_height; i++) {
+		m_zbuffer[i] = 0;
+	}
+}
+
 void Renderer::SetDemoBuffer()
 {
 	//vertical line
@@ -245,6 +257,9 @@ vec4 Renderer::applyTrasformations(const vec3& p) const {
 
 void Renderer::setPixels(vector<Pixel> pixels) const {
 	for (Pixel p : pixels) {
+		if (p.X() < 0 || p.X() > 511 || p.Y() < 0 || p.Y() > 511) {
+			continue;
+		}
 		m_outBuffer[INDEX(m_width, p.X(), p.Y(), 0)] = p.red();
 		m_outBuffer[INDEX(m_width, p.X(), p.Y(), 1)] = p.green();
 		m_outBuffer[INDEX(m_width, p.X(), p.Y(), 2)] = p.blue();

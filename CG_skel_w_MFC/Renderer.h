@@ -36,7 +36,10 @@ public:
 	Renderer();
 	Renderer(int width, int height);
 	~Renderer(void);
-	void Init();
+	void Init() {
+		ClearColorBuffer();
+		ClearDepthBuffer();
+	}
 	void DrawTriangles(const vector<vec3>* vertices, const vector<vec3>* normals=NULL) const;
 	void SetCameraTransform(const mat4& cTransform);
 	void SetProjection(const mat4& projection);
