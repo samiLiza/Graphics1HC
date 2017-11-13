@@ -20,11 +20,14 @@
 #include "InitShader.h"
 #include "Scene.h"
 #include "Renderer.h"
+#include "DialogBoxes.h"
 #include <string>
 
 #define BUFFER_OFFSET( offset )   ((GLvoid*) (offset))
 
 #define FILE_OPEN 1
+#define ADD_CUBE 2
+#define ADD_PYRAMID 3
 #define MAIN_DEMO 1
 #define MAIN_ABOUT 2
 
@@ -88,18 +91,41 @@ void motion(int x, int y)
 	last_y=y;
 }
 
-void fileMenu(int id)
+void ModelMenu(int id)
+{
+}
+
+void addModelMenu(int id)
 {
 	switch (id)
 	{
 		case FILE_OPEN:
-			CFileDialog dlg(TRUE,_T(".obj"),NULL,NULL,_T("*.obj|*.*"));
-			if(dlg.DoModal()==IDOK)
+		{
+			CFileDialog dlg(TRUE, _T(".obj"), NULL, NULL, _T("*.obj|*.*"));
+			if (dlg.DoModal() == IDOK)
 			{
 				std::string s((LPCTSTR)dlg.GetPathName());
 				scene->loadOBJModel((LPCTSTR)dlg.GetPathName());
 			}
+		}
 			break;
+
+		case ADD_CUBE:
+		{
+			SetXYZDialog dlgUp("INSERT UP COORDINATES");
+			if (dlgUp.DoModal() == IDOK) {
+				vec3 up = dlgUp.getInput();
+				cout << up.x;
+			}
+			scene->loadPrimMeshModel(CUBE);
+			break;
+		}
+		case ADD_PYRAMID:
+		{
+			scene->loadPrimMeshModel(PYRAMID);
+			break;
+		}
+
 	}
 }
 
@@ -118,11 +144,16 @@ void mainMenu(int id)
 
 void initMenu()
 {
+	int menuAddModel = glutCreateMenu(addModelMenu);
+	glutAddMenuEntry("Open File",FILE_OPEN);
+	glutAddMenuEntry("Add Cube", ADD_CUBE);
+	glutAddMenuEntry("Add Pyramid", ADD_PYRAMID);
 
-	int menuFile = glutCreateMenu(fileMenu);
-	glutAddMenuEntry("Open..",FILE_OPEN);
+	int menuModel = glutCreateMenu(ModelMenu);
+	glutAddSubMenu("Add..", menuAddModel);
+
 	glutCreateMenu(mainMenu);
-	glutAddSubMenu("File",menuFile);
+	glutAddSubMenu("Model", menuModel);
 	glutAddMenuEntry("Demo",MAIN_DEMO);
 	glutAddMenuEntry("About",MAIN_ABOUT);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);

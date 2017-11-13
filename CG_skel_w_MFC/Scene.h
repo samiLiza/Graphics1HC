@@ -7,6 +7,8 @@
 #include "Camera.h"
 using namespace std;
 
+typedef enum { CUBE, PYRAMID } PrimitiveModelType;
+
 class Model {
 public:
 	virtual ~Model() {}
@@ -32,7 +34,9 @@ public:
 	void loadOBJModel(string fileName);
 	void draw();
 	void drawDemo();
+	void TranslateModel();
 	void addCamera(CameraType type);
+	void loadPrimMeshModel(PrimitiveModelType type);
 	
 	int activeModel;
 	int activeLight;

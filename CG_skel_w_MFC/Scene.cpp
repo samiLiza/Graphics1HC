@@ -57,3 +57,9 @@ void Scene::addCamera(CameraType type)
 	cameras.push_back(cam);
 }
 
+void Scene::loadPrimMeshModel(PrimitiveModelType type) 
+{
+	//cout << " HI " << endl;
+}
+
+
