@@ -5,15 +5,9 @@
 #include <string>
 #include "Renderer.h"
 #include "Camera.h"
+#include "MeshModel.h"
+#include "PrimMeshModel.h"
 using namespace std;
-
-typedef enum { CUBE, PYRAMID } PrimitiveModelType;
-
-class Model {
-public:
-	virtual ~Model() {}
-	void virtual draw(const Renderer& rend)=0;
-};
 
 
 class Light {
@@ -23,22 +17,33 @@ class Light {
 
 class Scene {
 
-	vector<Model*> models;
+	vector<MeshModel*> models;
 	vector<Light*> lights;
 	vector<Camera*> cameras;
 	Renderer *m_renderer;
 
+	int sceneWidth;
+	int sceneHeight;
+
 public:
 	Scene() {};
-	Scene(Renderer *renderer) : m_renderer(renderer) {};
+	Scene(Renderer *renderer, int width = 512, int height = 512) : m_renderer(renderer), sceneWidth(width), sceneHeight(height) {};
 	void loadOBJModel(string fileName);
 	void draw();
 	void drawDemo();
-	void TranslateModel();
 	void addCamera(CameraType type);
-	void loadPrimMeshModel(PrimitiveModelType type);
+	void addPrimitive(PrimitiveModelType type, float size = 1.0);
 	
+	void scale(float x, float y, float z); // scale active model
+	void translate(float x, float y, float z);
+	void rotate(float angle);
+
 	int activeModel;
 	int activeLight;
 	int activeCamera;
+
+	void showBoundingBox();
+	void hideBoundingBox();
+
+	void setActiveModel(int modelIdx);
 };

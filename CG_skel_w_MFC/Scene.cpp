@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Scene.h"
-#include "MeshModel.h"
 #include <string>
 
 using namespace std;
@@ -22,14 +21,19 @@ void Scene::draw()
 		return;
 	}
 	// 1. Send the renderer the current camera transform and the projection
-	m_renderer->SetCameraTransform(cameras[activeCamera]->getCameraTransform());
-	m_renderer->SetProjection(cameras[activeCamera]->getProjection());
 	
+	/* ToDo Review the 2 lines*/
+	//m_renderer->ClearColorBuffer();
+	//m_renderer->ClearDepthBuffer();
+	
+	mat4 cameraTransform = cameras[activeCamera]->getCameraTransform();
+	mat4 projection = cameras[activeCamera]->getProjection();
 	// 2. Tell all models to draw themselves
-	for (Model* model : models) {
-		model->draw(*m_renderer);
+	for (MeshModel* model : models) {
+		//mat4 modelTransform = model->getModelTransform;
+		//mat4 worldTransform = model->getWorldTransform;
+		model->draw(*m_renderer, cameraTransform, projection);
 	}
-
 
 	m_renderer->SwapBuffers();
 }
@@ -42,6 +46,8 @@ void Scene::drawDemo()
 
 void Scene::addCamera(CameraType type)
 {
+	float middleW = sceneWidth / 2;
+	float middleH = sceneHeight / 2;
 	Camera* cam;
 	if (type == ORTHOGONAL)
 	{
@@ -52,14 +58,86 @@ void Scene::addCamera(CameraType type)
 		cam = new PerspectiveCamera();
 	}
 
-	cam->setCameraParams(-1, 1, -1, 1, -1, 1);
-	cam->LookAt(vec4(0, 0, 0, 0), vec4(0, 0, -1, 0), vec4(0, 1, 0, 0));
+	//cam->setCameraParams(-0.01 * middleW, 0.01 * middleW, -0.01 * middleH, 0.01 * middleH, -10, 10);
+	//cam->setCameraParams(-0.01 * middleW, 0.01 * middleW, -0.01 * middleH, 0.01 * middleH, -10, 10);
+	cam->setCameraParams(-1 , 1, -1 , 1 , -1, 1);
+	cam->LookAt(vec4(-4, 2, 2, 0), vec4(0, 0, -1, 0), vec4(0, 1, 0, 0));
 	cameras.push_back(cam);
 }
 
-void Scene::loadPrimMeshModel(PrimitiveModelType type) 
+void Scene::setActiveModel(int modelIdx) 
 {
-	//cout << " HI " << endl;
+	if (modelIdx < 0 || modelIdx >= models.size()) 
+	{
+		cout << "setActiveModel: invalid index " << modelIdx << endl;
+		return;
+	}
+	activeModel = modelIdx;
 }
+
+void Scene::addPrimitive(PrimitiveModelType type, float size)
+{
+	// fix if new primitives added
+	MeshModel* primModel = new Cube(size);
+	models.push_back(primModel);
+	if (cameras.empty()) {
+		addCamera(PERSPECTIVE);
+		activeCamera = 0;
+	}
+	activeModel = models.size() - 1;
+	draw();
+}
+
+
+void Scene::scale(float x, float y, float z) 
+{
+	// ToDo : scaling in world frame
+	// ToDo :if showBounding box add transform to the bounding box
+	if (activeModel >= 0) {
+		mat4 scaleTransform = Scale(x, y, z);
+		MeshModel* modelToScale = models[activeModel];
+		modelToScale->addModelTransform(scaleTransform);
+		if (modelToScale->boundingBox)
+			modelToScale->boundingBox->addModelTransform(scaleTransform);
+		draw();
+	}
+}
+
+void Scene::translate(float x, float y, float z)
+{
+	// ToDo : translating in world frame
+	// ToDo :if showBounding box add transform to the bounding box
+	if (activeModel >= 0) {
+		mat4 translateTransform = Translate(x, y, z);
+		MeshModel* modelToTranslate = models[activeModel];
+		modelToTranslate->addModelTransform(translateTransform);
+		if (modelToTranslate->boundingBox)
+			modelToTranslate->boundingBox->addModelTransform(translateTransform);
+		draw();
+	}
+}
+
+// Rotation!!!
+
+void Scene::rotate(float angle)
+{
+	
+}
+
+void Scene::showBoundingBox() 
+{
+	if (activeModel >= 0) {
+		models[activeModel]->setShowBox();
+		draw();
+	}
+}
+void Scene::hideBoundingBox() 
+{
+	if (activeModel >= 0) {
+		models[activeModel]->unsetShowBox();
+		draw();
+	}
+}
+
 
 

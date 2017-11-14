@@ -52,28 +52,20 @@ void Renderer::SetDemoBuffer()
 		m_outBuffer[INDEX(m_width,256,i,0)]=1;	m_outBuffer[INDEX(m_width,256,i,1)]=0;	m_outBuffer[INDEX(m_width,256,i,2)]=0;
 
 	}
-	//DrawLine(511, 511, 0, 0);
-	//DrawLine(0, 511, 511, 0);
 	for(int i=0; i<m_width; i++)
 	{
 		m_outBuffer[INDEX(m_width,i,256,0)]=1;	m_outBuffer[INDEX(m_width,i,256,1)]=0;	m_outBuffer[INDEX(m_width,i,256,2)]=1;
 
 	}
 
-	vector<vec3> vertices;
-
-	vertices.push_back(vec3(200, 200, 0));
-	vertices.push_back(vec3(256, 256, 10));
-	vertices.push_back(vec3(400, 300, -3));
-	DrawTriangles(&vertices);
 }
 
-void Renderer::DrawTriangles(const vector<vec3>* vertices, const vector<vec3>* normals) const 
+void Renderer::DrawTriangles(const vector<vec3>* vertices, const mat4& mTransform, const mat4& wTransform, const mat4& cTransform, const mat4& projection, const vector<vec3>* normals) const
 {
 	for (int i = 0; i < vertices->size(); i += 3) {
-		vec4 p1 = applyTrasformations(vertices->at(i));
-		vec4 p2 = applyTrasformations(vertices->at(i+1));
-		vec4 p3 = applyTrasformations(vertices->at(i+2));
+		vec4 p1 = applyTrasformations(vertices->at(i), mTransform, wTransform, cTransform, projection);
+		vec4 p2 = applyTrasformations(vertices->at(i+1), mTransform, wTransform, cTransform, projection);
+		vec4 p3 = applyTrasformations(vertices->at(i+2), mTransform, wTransform, cTransform, projection);
 		viewPort(p1);
 		viewPort(p2);
 		viewPort(p3);
@@ -83,10 +75,42 @@ void Renderer::DrawTriangles(const vector<vec3>* vertices, const vector<vec3>* n
 		DrawLine(p2.x, p2.y, p3.x, p3.y, pixels);
 		setPixels(pixels);
 
-
-
 	}
 
+}
+
+// ONLY FOR CUBE!!!
+void Renderer::DrawCube(const vector<vec3>* vertices, const mat4& mTransform, const mat4& wTransform, const mat4& cTransform, const mat4& projection, const vector<vec3>* normals) const
+{
+	if (!vertices) {
+		cout << "DrawCube error: vertices is invalid" << endl;
+	}
+	vector<vec4> tempVertices;
+	vector<Pixel> pixels;
+	//for (vec3 vertex : *vertices)
+	for(int i = 0; i < vertices->size(); i++)
+	{
+		vec4 p = applyTrasformations((*vertices)[i], mTransform, wTransform, cTransform, projection);
+		viewPort(p);
+		tempVertices.push_back(p);
+	}
+
+	DrawLine(tempVertices[0].x, tempVertices[0].y, tempVertices[1].x, tempVertices[1].y, pixels);
+	DrawLine(tempVertices[0].x, tempVertices[0].y, tempVertices[2].x, tempVertices[2].y, pixels);
+	DrawLine(tempVertices[3].x, tempVertices[3].y, tempVertices[1].x, tempVertices[1].y, pixels); 
+	DrawLine(tempVertices[3].x, tempVertices[3].y, tempVertices[2].x, tempVertices[2].y, pixels);
+
+	DrawLine(tempVertices[4].x, tempVertices[4].y, tempVertices[5].x, tempVertices[5].y, pixels); // red
+	DrawLine(tempVertices[4].x, tempVertices[4].y, tempVertices[6].x, tempVertices[6].y, pixels); // green
+	DrawLine(tempVertices[7].x, tempVertices[7].y, tempVertices[5].x, tempVertices[5].y, pixels); // blue
+	DrawLine(tempVertices[7].x, tempVertices[7].y, tempVertices[6].x, tempVertices[6].y, pixels);
+
+	DrawLine(tempVertices[0].x, tempVertices[0].y, tempVertices[4].x, tempVertices[4].y, pixels);
+	DrawLine(tempVertices[1].x, tempVertices[1].y, tempVertices[5].x, tempVertices[5].y, pixels);
+	DrawLine(tempVertices[2].x, tempVertices[2].y, tempVertices[6].x, tempVertices[6].y, pixels);
+	DrawLine(tempVertices[3].x, tempVertices[3].y, tempVertices[7].x, tempVertices[7].y, pixels);
+
+	setPixels(pixels);
 }
 
 //void Renderer::setCamera(Camera* camera) 
@@ -176,14 +200,9 @@ void Renderer::SwapBuffers()
 	a = glGetError();
 }
 
-void Renderer::DrawLine(int x0, int y0, int x1, int y1, vector<Pixel>& pixels /* Pixels to fill ?*/) const
+void Renderer::DrawLine(int x0, int y0, int x1, int y1, vector<Pixel>& pixels /* Pixels to fill ?*/, int red, int green, int blue) const
 {
 	// assert: y0 > y1
-	if (x0 > x1)
-	{
-		std::swap(x0, x1);
-		std::swap(y0, y1);
-	}
 
 	int deltaX = std::abs(x1 - x0); // What if x0 > x1??
 	int deltaY = std::abs(y1 - y0);// What if y0 > y1??
@@ -191,7 +210,6 @@ void Renderer::DrawLine(int x0, int y0, int x1, int y1, vector<Pixel>& pixels /*
 	int delta;
 	int threshold;
 	int threshInc;
-	int yInc = ( y0 > y1 ) ? -1 : 1;
 	if (deltaY > deltaX)
 	{
 		std::swap(x0, y0);
@@ -206,7 +224,13 @@ void Renderer::DrawLine(int x0, int y0, int x1, int y1, vector<Pixel>& pixels /*
 		threshold = deltaX;
 		threshInc = 2 * deltaX;
 	}
+	if (x0 > x1)
+	{
+		std::swap(x0, x1);
+		std::swap(y0, y1);
 
+	}
+	int yInc = (y0 > y1) ? -1 : 1;
 	int realY = 0;
 	int currY = y0;
 	Pixel p;
@@ -224,7 +248,7 @@ void Renderer::DrawLine(int x0, int y0, int x1, int y1, vector<Pixel>& pixels /*
 			p.setCordinates(currX, currY);
 		}
 		
-		p.setColor(1, 1, 0); // The colors are random
+		p.setColor(red, green, blue); // The colors are random
 
 		realY += delta;
 		if (realY >= threshold)
@@ -237,12 +261,13 @@ void Renderer::DrawLine(int x0, int y0, int x1, int y1, vector<Pixel>& pixels /*
 
 }
 
+
 void Renderer::viewPort(vec4& p) const {
 	p.x = (m_width / 2)*(p.x + 1);
 	p.y = (m_height / 2)*(p.y + 1);
 }
 
-vec4 Renderer::applyTrasformations(const vec3& p) const {
+vec4 Renderer::applyTrasformations(const vec3& p, const mat4& mTransform, const mat4& wTransform, const mat4& cTransform, const mat4& projection) const {
 	vec4 homog(p);
 	homog = mTransform*homog; //model
 	homog = wTransform*homog; //world
@@ -257,7 +282,7 @@ vec4 Renderer::applyTrasformations(const vec3& p) const {
 
 void Renderer::setPixels(vector<Pixel> pixels) const {
 	for (Pixel p : pixels) {
-		if (p.X() < 0 || p.X() > 511 || p.Y() < 0 || p.Y() > 511) {
+		if (p.X() < 0 || p.X() > (m_width - 1) || p.Y() < 0 || p.Y() > (m_height - 1)) {
 			continue;
 		}
 		m_outBuffer[INDEX(m_width, p.X(), p.Y(), 0)] = p.red();
@@ -265,7 +290,7 @@ void Renderer::setPixels(vector<Pixel> pixels) const {
 		m_outBuffer[INDEX(m_width, p.X(), p.Y(), 2)] = p.blue();
 	}
 }
-
+/*
 void Renderer::SetCameraTransform(const mat4& cTransform) {
 	this->cTransform = cTransform;
 }
@@ -278,3 +303,4 @@ void Renderer::SetObjectMatrices(const mat4& mTransform, mat4& wTransform, mat3&
 	this->mTransform = mTransform;
 	this->wTransform = wTransform;
 }
+*/

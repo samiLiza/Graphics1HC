@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "Camera.h"
+#include "mat.h"
 
 
 void Camera::setParamsAux(const float left, const float right,
@@ -29,6 +30,11 @@ void Camera::LookAt(const vec4& eye, const vec4& at, const vec4& up)
 	mat4 c = mat4(u, v, n, t);
 	cTransform = c * Translate(-eye);
 
+}
+
+void Camera::addTransformation(const mat4& transform)
+{
+	cTransform = cTransform * transpose(transform);
 }
 
 // ORTHO

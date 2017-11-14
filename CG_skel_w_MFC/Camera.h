@@ -23,7 +23,7 @@ protected:
 
 public:
 	virtual ~Camera() {}
-	void setTransformation(const mat4& transform);
+	void addTransformation(const mat4& transform);
 	
 	void LookAt(const vec4& eye, const vec4& at, const vec4& up);
 	

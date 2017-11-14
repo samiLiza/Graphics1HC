@@ -431,9 +431,9 @@ class mat4 {
 
 	for ( int i = 0; i < 4; ++i ) {
 	    for ( int j = 0; j < 4; ++j ) {
-		for ( int k = 0; k < 4; ++k ) {
-		    a[i][j] += _m[i][k] * m[k][j];
-		}
+			for ( int k = 0; k < 4; ++k ) {
+				a[i][j] += _m[i][k] * m[k][j];
+			}
 	    }
 	}
 
@@ -567,6 +567,7 @@ vec4 mvmult( const mat4& a, const vec4& b )
 //  Rotation matrix generators
 //
 
+// theta is in degrees 
 inline
 mat4 RotateX( const GLfloat theta )
 {
@@ -578,6 +579,31 @@ mat4 RotateX( const GLfloat theta )
     c[1][2] = -c[2][1];
     return c;
 }
+
+inline
+mat4 RotateY(const GLfloat theta)
+{
+	GLfloat angle = (M_PI / 180.0) * theta;
+
+	mat4 c;
+	c[2][2] = c[0][0] = cos(angle);
+	c[0][2] = sin(angle);
+	c[2][0] = -c[0][2];
+	return c;
+}
+
+inline
+mat4 RotateZ(const GLfloat theta)
+{
+	GLfloat angle = (M_PI / 180.0) * theta;
+
+	mat4 c;
+	c[1][1] = c[0][0] = cos(angle);
+	c[1][0] = sin(angle);
+	c[0][1] = -c[1][0];
+	return c;
+}
+
 
 
 //----------------------------------------------------------------------------
