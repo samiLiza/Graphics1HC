@@ -38,8 +38,7 @@ public:
 	void addNormalTransform(const mat3& transform);
 	void addModelTransform(const mat4& transform);
 
-	void setShowBox();
-	void unsetShowBox();
+	void switchBoundingBox();
 
 	void initBoundingBox();
 

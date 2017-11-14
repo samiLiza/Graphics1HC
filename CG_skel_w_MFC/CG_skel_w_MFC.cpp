@@ -24,12 +24,27 @@
 #include <string>
 
 #define BUFFER_OFFSET( offset )   ((GLvoid*) (offset))
-
+//.start MainMenu
+//--.start Model  menu
+//----.start Add Model Menu
 #define FILE_OPEN 1
 #define ADD_CUBE 2
 #define ADD_PYRAMID 3
+//----.end Add Model Menu
+#define TRANSLATE_MODEL 1
+#define ROTATE_MODEL 2
+#define SCALE_MODEL 3
+#define BOUNDING_BOX_MODEL 4
+#define FACE_NORMALS_MODEL 5
+#define VERTEX_NORMALS_MODEL 6
+//----.start Add World Menu
+#define TRANSLATE_WORLD 1
+#define ROTATE_WORLD 2
+#define SCALE_WORLD 3
+//----.end World Menu
 #define MAIN_DEMO 1
 #define MAIN_ABOUT 2
+//.end Main Menu
 
 Scene *scene;
 Renderer *renderer;
@@ -91,10 +106,6 @@ void motion(int x, int y)
 	last_y=y;
 }
 
-void ModelMenu(int id)
-{
-}
-
 void addModelMenu(int id)
 {
 	switch (id)
@@ -112,20 +123,87 @@ void addModelMenu(int id)
 
 		case ADD_CUBE:
 		{
-			SetXYZDialog dlgUp("INSERT UP COORDINATES");
-			if (dlgUp.DoModal() == IDOK) {
-				vec3 up = dlgUp.getInput();
-				cout << up.x;
-			}
-			scene->loadPrimMeshModel(CUBE);
+			scene->addPrimitive(CUBE);
 			break;
 		}
 		case ADD_PYRAMID:
 		{
-			scene->loadPrimMeshModel(PYRAMID);
+			scene->addPrimitive(PYRAMID);
 			break;
 		}
 
+	}
+}
+
+void ModelMenu(int id)
+{
+	switch (id)
+	{
+	case TRANSLATE_MODEL:
+	{
+		SetXYZDialog dlg;
+		if (dlg.DoModal() == 1)
+		{
+			vec3 xyz = dlg.getInput();
+			scene->translateModel(xyz.x, xyz.y, xyz.z);
+			scene->draw();
+		}
+		break;
+	}
+
+	case ROTATE_MODEL:
+	{
+		//TODO: call scene->rotateModel(..);
+		scene->draw();
+		break;
+	}
+	case SCALE_MODEL:
+	{
+		SetXYZDialog dlg;
+		if (dlg.DoModal() == 1)
+		{
+			vec3 xyz = dlg.getInput();
+			scene->scaleModel(xyz.x, xyz.y, xyz.z);
+			scene->draw();
+		}
+		break;
+	}
+	case BOUNDING_BOX_MODEL:
+	{
+		scene->switchBoundingBox();
+		scene->draw();
+		break;
+	}
+	case VERTEX_NORMALS_MODEL:
+	{
+		scene->switchVertexNormals();
+		scene->draw();
+		break;
+	}
+	case FACE_NORMALS_MODEL:
+	{
+		scene->switchfaceNormals();
+		scene->draw();
+		break;
+	}
+
+	}
+}
+
+void WorldMenu(int id)
+{
+	switch (id)
+	{
+	case TRANSLATE_WORLD:
+	{
+	}
+
+	case ROTATE_WORLD:
+	{
+	}
+	case SCALE_WORLD:
+	{
+	}
 	}
 }
 
@@ -143,17 +221,29 @@ void mainMenu(int id)
 }
 
 void initMenu()
-{
+{	//-- menuAddModel
 	int menuAddModel = glutCreateMenu(addModelMenu);
 	glutAddMenuEntry("Open File",FILE_OPEN);
 	glutAddMenuEntry("Add Cube", ADD_CUBE);
 	glutAddMenuEntry("Add Pyramid", ADD_PYRAMID);
-
+	//-- menuModel
 	int menuModel = glutCreateMenu(ModelMenu);
 	glutAddSubMenu("Add..", menuAddModel);
-
+	glutAddMenuEntry("Translate", TRANSLATE_MODEL);
+	glutAddMenuEntry("Rotate", ROTATE_MODEL);
+	glutAddMenuEntry("Scale", SCALE_MODEL);
+	glutAddMenuEntry("Show/Hide Bounding Box", BOUNDING_BOX_MODEL);
+	glutAddMenuEntry("Show/Hide Face Normals", FACE_NORMALS_MODEL);
+	glutAddMenuEntry("Show/Hide Vertex Normals", VERTEX_NORMALS_MODEL);
+	//-- menuModel
+	int menuWorld = glutCreateMenu(WorldMenu);
+	glutAddMenuEntry("Translate", TRANSLATE_WORLD);
+	glutAddMenuEntry("Rotate", ROTATE_WORLD);
+	glutAddMenuEntry("Scale", SCALE_WORLD);
+	//-- mainMenu
 	glutCreateMenu(mainMenu);
 	glutAddSubMenu("Model", menuModel);
+	glutAddSubMenu("World", menuWorld);
 	glutAddMenuEntry("Demo",MAIN_DEMO);
 	glutAddMenuEntry("About",MAIN_ABOUT);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);

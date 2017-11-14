@@ -120,13 +120,9 @@ void MeshModel::loadFile(string fileName)
 	}
 }
 
-void MeshModel::setShowBox()
+void MeshModel::switchBoundingBox()
 {
-	showBox = true;
-}
-void MeshModel::unsetShowBox()
-{
-	showBox = false;
+	showBox = !showBox;
 }
 
 

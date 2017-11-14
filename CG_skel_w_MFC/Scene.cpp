@@ -89,7 +89,7 @@ void Scene::addPrimitive(PrimitiveModelType type, float size)
 }
 
 
-void Scene::scale(float x, float y, float z) 
+void Scene::scaleModel(float x, float y, float z) 
 {
 	// ToDo : scaling in world frame
 	// ToDo :if showBounding box add transform to the bounding box
@@ -99,13 +99,11 @@ void Scene::scale(float x, float y, float z)
 		modelToScale->addModelTransform(scaleTransform);
 		if (modelToScale->boundingBox)
 			modelToScale->boundingBox->addModelTransform(scaleTransform);
-		draw();
 	}
 }
 
-void Scene::translate(float x, float y, float z)
+void Scene::translateModel(float x, float y, float z)
 {
-	// ToDo : translating in world frame
 	// ToDo :if showBounding box add transform to the bounding box
 	if (activeModel >= 0) {
 		mat4 translateTransform = Translate(x, y, z);
@@ -113,30 +111,31 @@ void Scene::translate(float x, float y, float z)
 		modelToTranslate->addModelTransform(translateTransform);
 		if (modelToTranslate->boundingBox)
 			modelToTranslate->boundingBox->addModelTransform(translateTransform);
-		draw();
 	}
 }
 
 // Rotation!!!
 
-void Scene::rotate(float angle)
+void Scene::rotateModel(float angle)
 {
 	
 }
 
-void Scene::showBoundingBox() 
+void Scene::switchBoundingBox() 
 {
 	if (activeModel >= 0) {
-		models[activeModel]->setShowBox();
-		draw();
+		models[activeModel]->switchBoundingBox();
 	}
 }
-void Scene::hideBoundingBox() 
+
+void Scene::switchVertexNormals()
 {
-	if (activeModel >= 0) {
-		models[activeModel]->unsetShowBox();
-		draw();
-	}
+	//TODO: add functionality
+}
+
+void Scene::switchfaceNormals()
+{
+	//TODO: add functionality
 }
 
 

@@ -3,6 +3,7 @@
 #ifndef _DIALOGBOXES_H_
 #define _DIALOGBOXES_H_
 
+#include "Resource.h"
 #include <string>
 #include <vector>
 #include "vec.h"
@@ -19,7 +20,7 @@ class CommonInputDialog : public CDialog
 	CString title;
 
 public:
-	enum { IDD = IDD_DIALOG1 };
+	enum { IDD = IDD_DIALOG2 };
 
 	CommonInputDialog(CString title = "") : CDialog(IDD), title(title) {}
 	virtual ~CommonInputDialog() {}
@@ -46,6 +47,7 @@ private:
 	afx_msg int OnCreate(LPCREATESTRUCT lpcs);
 	afx_msg void OnPaint();
 	DECLARE_MESSAGE_MAP()
+
 public:
 	SetXYZDialog(CString title = "Set X Y Z") : CommonInputDialog(title), x(0.0), y(0.0), z(0.0) {}
 	virtual ~SetXYZDialog() {}
