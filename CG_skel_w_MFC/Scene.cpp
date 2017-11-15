@@ -9,7 +9,6 @@ void Scene::loadOBJModel(string fileName)
 	models.push_back(model);
 	if (cameras.empty()) {
 		addCamera(PERSPECTIVE);
-		activeCamera = 0;
 	}
 	activeModel = models.size() - 1;
 	draw();
@@ -44,10 +43,8 @@ void Scene::drawDemo()
 	m_renderer->SwapBuffers();
 }
 
-void Scene::addCamera(CameraType type)
+void Scene::addCamera(CameraType type, float left, float right, float bottom, float top, float zNear, float zFar)
 {
-	float middleW = sceneWidth / 2;
-	float middleH = sceneHeight / 2;
 	Camera* cam;
 	if (type == ORTHOGONAL)
 	{
@@ -58,11 +55,19 @@ void Scene::addCamera(CameraType type)
 		cam = new PerspectiveCamera();
 	}
 
-	//cam->setCameraParams(-0.01 * middleW, 0.01 * middleW, -0.01 * middleH, 0.01 * middleH, -10, 10);
-	//cam->setCameraParams(-0.01 * middleW, 0.01 * middleW, -0.01 * middleH, 0.01 * middleH, -10, 10);
-	cam->setCameraParams(-1 , 1, -1 , 1 , -1, 1);
-	cam->LookAt(vec4(-4, 2, 2, 0), vec4(0, 0, -1, 0), vec4(0, 1, 0, 0));
+	cam->setCameraParams(left , right, bottom , top , zNear, zFar);
+	cam->LookAt(vec4(0, 0, 0, 0), vec4(0, 0, -1, 0), vec4(0, 1, 0, 0));
 	cameras.push_back(cam);
+	activeCamera = cameras.size() - 1;
+}
+
+void Scene::addFovyAspectCamera(float fovy, float aspect, float zNear, float zFar)
+{
+	PerspectiveCamera cam;
+	cam.perspective(30,1,1,100);
+	cam.LookAt(vec4(0, 0, 0, 0), vec4(0, 0, -1, 0), vec4(0, 1, 0, 0));
+	cameras.push_back(&cam);
+	activeCamera = cameras.size() - 1;
 }
 
 void Scene::setActiveModel(int modelIdx) 
@@ -119,6 +124,18 @@ void Scene::translateModel(float x, float y, float z)
 void Scene::rotateModel(float angle)
 {
 	
+}
+
+void Scene::translateWorld(float x, float y, float z)
+{
+}
+
+void Scene::scaleWorld(float x, float y, float z)
+{
+}
+
+void Scene::rotateWorld(float angle)
+{
 }
 
 void Scene::switchBoundingBox() 

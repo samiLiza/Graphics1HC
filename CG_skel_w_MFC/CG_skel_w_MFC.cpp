@@ -37,11 +37,16 @@
 #define BOUNDING_BOX_MODEL 4
 #define FACE_NORMALS_MODEL 5
 #define VERTEX_NORMALS_MODEL 6
-//----.start Add World Menu
+//----.start World Menu
 #define TRANSLATE_WORLD 1
 #define ROTATE_WORLD 2
 #define SCALE_WORLD 3
 //----.end World Menu
+//----.start Add Camera Menu
+#define ADD_ORTHO_CAMERA 1
+#define ADD_PERSPECTIVE_CAMERA 2
+#define ADD_FOVY_ASPECT_CAMERA 3
+//----.end Add Camera Menu
 #define MAIN_DEMO 1
 #define MAIN_ABOUT 2
 //.end Main Menu
@@ -113,7 +118,7 @@ void addModelMenu(int id)
 		case FILE_OPEN:
 		{
 			CFileDialog dlg(TRUE, _T(".obj"), NULL, NULL, _T("*.obj|*.*"));
-			if (dlg.DoModal() == IDOK)
+			if (dlg.DoModal() == 1)
 			{
 				std::string s((LPCTSTR)dlg.GetPathName());
 				scene->loadOBJModel((LPCTSTR)dlg.GetPathName());
@@ -141,11 +146,10 @@ void ModelMenu(int id)
 	{
 	case TRANSLATE_MODEL:
 	{
-		SetXYZDialog dlg;
+		SetXYZDialog dlg("Translation Params", 0);
 		if (dlg.DoModal() == 1)
 		{
-			vec3 xyz = dlg.getInput();
-			scene->translateModel(xyz.x, xyz.y, xyz.z);
+			scene->translateModel(dlg.x, dlg.y, dlg.z);
 			scene->draw();
 		}
 		break;
@@ -159,11 +163,10 @@ void ModelMenu(int id)
 	}
 	case SCALE_MODEL:
 	{
-		SetXYZDialog dlg;
+		SetXYZDialog dlg("Scale Params", 1);
 		if (dlg.DoModal() == 1)
 		{
-			vec3 xyz = dlg.getInput();
-			scene->scaleModel(xyz.x, xyz.y, xyz.z);
+			scene->scaleModel(dlg.x, dlg.y, dlg.z);
 			scene->draw();
 		}
 		break;
@@ -196,15 +199,73 @@ void WorldMenu(int id)
 	{
 	case TRANSLATE_WORLD:
 	{
+		SetXYZDialog dlg("Translation Params", 0);
+		if (dlg.DoModal() == 1)
+		{
+			scene->translateWorld(dlg.x, dlg.y, dlg.z);
+			scene->draw();
+		}
+		break;
 	}
 
 	case ROTATE_WORLD:
 	{
+		scene->draw();
+		break;
 	}
 	case SCALE_WORLD:
 	{
+		SetXYZDialog dlg("Scale Params", 1);
+		if (dlg.DoModal() == 1)
+		{
+			scene->scaleWorld(dlg.x, dlg.y, dlg.z);
+			scene->draw();
+		}
+		break;
 	}
 	}
+}
+
+void addCameraMenu(int id)
+{
+	switch(id)
+	{
+	case ADD_ORTHO_CAMERA:
+	{
+		SetViewVolumeDialog dlg("View Volume Params");
+		if (dlg.DoModal() == 1)
+		{
+			scene->addCamera(ORTHOGONAL, dlg.left, dlg.right, dlg.bottom, dlg.top, dlg.zNear, dlg.zFar);
+			scene->draw();
+		}
+		break;
+	}
+	case ADD_PERSPECTIVE_CAMERA:
+	{
+		SetViewVolumeDialog dlg("View Volume Params");
+		if (dlg.DoModal() == 1)
+		{
+			scene->addCamera(PERSPECTIVE, dlg.left, dlg.right, dlg.bottom, dlg.top, dlg.zNear, dlg.zFar);
+			scene->draw();
+		}
+		break;
+	}
+	case ADD_FOVY_ASPECT_CAMERA:
+	{
+		SetViewVolumeDialog dlg("View Volume Params");
+		if (dlg.DoModal() == 1)
+		{
+			scene->addCamera(PERSPECTIVE, dlg.left, dlg.right, dlg.bottom, dlg.top, dlg.zNear, dlg.zFar);
+			scene->draw();
+		}
+		break;
+	}
+
+	}
+}
+
+void CameraMenu(int id)
+{
 }
 
 void mainMenu(int id)
@@ -235,15 +296,24 @@ void initMenu()
 	glutAddMenuEntry("Show/Hide Bounding Box", BOUNDING_BOX_MODEL);
 	glutAddMenuEntry("Show/Hide Face Normals", FACE_NORMALS_MODEL);
 	glutAddMenuEntry("Show/Hide Vertex Normals", VERTEX_NORMALS_MODEL);
-	//-- menuModel
+	//-- menuWorld
 	int menuWorld = glutCreateMenu(WorldMenu);
 	glutAddMenuEntry("Translate", TRANSLATE_WORLD);
 	glutAddMenuEntry("Rotate", ROTATE_WORLD);
 	glutAddMenuEntry("Scale", SCALE_WORLD);
+	//-- cameraAddMenu
+	int menuAddCamera = glutCreateMenu(addCameraMenu);
+	glutAddMenuEntry("Orthographic Camera", ADD_ORTHO_CAMERA);
+	glutAddMenuEntry("Perspective Camera", ADD_PERSPECTIVE_CAMERA);
+	glutAddMenuEntry("Perspective Camera, FOVY Aspect", ADD_FOVY_ASPECT_CAMERA);
+	//-- cameraMenu
+	int menuCamera = glutCreateMenu(CameraMenu);
+	glutAddSubMenu("Add..", menuAddCamera);
 	//-- mainMenu
 	glutCreateMenu(mainMenu);
 	glutAddSubMenu("Model", menuModel);
 	glutAddSubMenu("World", menuWorld);
+	glutAddSubMenu("Camera", menuCamera);
 	glutAddMenuEntry("Demo",MAIN_DEMO);
 	glutAddMenuEntry("About",MAIN_ABOUT);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);

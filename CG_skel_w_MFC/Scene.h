@@ -31,12 +31,16 @@ public:
 	void loadOBJModel(string fileName);
 	void draw();
 	void drawDemo();
-	void addCamera(CameraType type);
+	void addCamera(CameraType type, float left = -1.0, float right = 1.0, float bottom = -1.0, float top = 1.0, float zNear = -1.0, float zFar = 1.0);
+	void addFovyAspectCamera(float fovy, float aspect, float zNear, float zFar);
 	void addPrimitive(PrimitiveModelType type, float size = 1.0);
-	
-	void scaleModel(float x, float y, float z); // scale active model
+
 	void translateModel(float x, float y, float z);
+	void scaleModel(float x, float y, float z); // scale active model
 	void rotateModel(float angle);
+	void translateWorld(float x, float y, float z);
+	void scaleWorld(float x, float y, float z); // scale active model
+	void rotateWorld(float angle);
 
 	int activeModel;
 	int activeLight;

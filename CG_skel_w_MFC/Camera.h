@@ -31,7 +31,7 @@ public:
 		const float bottom, const float top,
 		const float zNear, const float zFar) = 0;
 
-	void virtual Perspective(const float fovy, const float aspect,
+	void virtual perspective(const float fovy, const float aspect,
 		const float zNear, const float zFar) = 0;
 
 	mat4 getCameraTransform() {
@@ -51,7 +51,7 @@ public:
 		const float bottom, const float top,
 		const float zNear, const float zFar); // ortho
 
-	void virtual Perspective(const float fovy, const float aspect,
+	void virtual perspective(const float fovy, const float aspect,
 		const float zNear, const float zFar) {}
 
 };
@@ -63,7 +63,7 @@ public:
 		const float bottom, const float top,
 		const float zNear, const float zFar); // Frustum
 
-	void Perspective(const float fovy, const float aspect,
+	void perspective(const float fovy, const float aspect,
 		const float zNear, const float zFar);
 
 };

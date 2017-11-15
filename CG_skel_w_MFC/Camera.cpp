@@ -71,7 +71,7 @@ void PerspectiveCamera::setCameraParams(const float left, const float right,
 
 } 
 
-void PerspectiveCamera::Perspective(const float fovy, const float aspect,
+void PerspectiveCamera::perspective(const float fovy, const float aspect,
 	const float zNear, const float zFar) 
 {
 	{
