@@ -41,11 +41,8 @@ public:
 		ClearColorBuffer();
 		ClearDepthBuffer();
 	}
-	void DrawTriangles(const vector<vec3>* vertices, const mat4& mTransform, const mat4& wTransform, const mat4& cTransform, const mat4& projection, const vector<vec3>* normals=NULL) const;
-	
-	//void SetCameraTransform(const mat4& cTransform);
-	//void SetProjection(const mat4& projection);
-	//void SetObjectMatrices(const mat4& mTransform, mat4& wTransform,  mat3& nTransform);
+	//void DrawTriangles(const vector<vec3>* vertices, const mat4& mTransform, const mat4& wTransform, const mat4& cTransform, const mat4& projection, const vector<vec3>* normals=NULL) const;
+	void DrawTriangles(const vector<vec3>* vertices, const mat4& mTransform, const mat4& wTransform, const mat4& cTransform, const mat4& projection, bool showFaceNormals, const mat3& nTransform, const vector<vec3>* normals = NULL) const;
 	
 	void SwapBuffers();
 	void ClearColorBuffer();
@@ -53,9 +50,16 @@ public:
 	void SetDemoBuffer();
 
 	void DrawLine(int x0, int y0, int x1, int y1, vector<Pixel>& pixels /* Pixels to fill ?*/, int red = 1, int green = 1, int blue = 0) const;
+	void DrawVerticalLine(int x0, int y0, int x1, int y1, vector<Pixel>& pixels /* Pixels to fill ?*/, int red = 1, int green = 1, int blue = 0) const;
+	void DrawSlopeLine(int x0, int y0, int x1, int y1, vector<Pixel>& pixels /* Pixels to fill ?*/, int red = 1, int green = 1, int blue = 0) const;
+
+	void DrawNormals(const vector<vec3>* normals, const mat3& normalModelTransform, const mat3& normalWorldTransform, const mat4& cTransform, const mat4& projection) const;
+	vec3 applyNormalTrasformations(const vec3& p, const mat3& mTransform, const mat3& wTransform, const mat4& cTransform, const mat4& projection) const;
+	
 	void DrawCube(const vector<vec3>* vertices, const mat4& mTransform, const mat4& wTransform, const mat4& cTransform, const mat4& projection, const vector<vec3>* normals = NULL) const;
 	//void setCamera(Camera* camera);
 	void viewPort(vec4& p) const;
+	void viewPort(vec3& p) const;
 	vec4 applyTrasformations(const vec3& p, const mat4& mTransform, const mat4& wTransform, const mat4& cTransform, const mat4& projection) const;
 	void setPixels(vector<Pixel> pixels) const;
 

@@ -16,13 +16,18 @@ public:
 class MeshModel 
 {
 protected :
-	MeshModel() : boundingBox(NULL), showBox(false) {}
+	MeshModel() : boundingBox(NULL), showBox(false), showFaceNormals(false), showVertexNormals(false) {}
 	vector<vec3> vertex_positions;
+	vector<vec3> vertexNormalPositions;
+	vector<vec3> normalFaces;
 	//add more attributes
 	mat4 _worldTransform;
-	mat3 _normalTransform;
 	mat4 _modelTransform;
-	
+	mat3 _normalObjectTransform; 
+	mat3 _normalWorldTransform;
+
+	bool showFaceNormals;
+	bool showVertexNormals;
 	bool showBox;
 
 public:
@@ -35,10 +40,13 @@ public:
 	MeshModel* boundingBox;
 
 	void addWorldTransform(const mat4& transform);
-	void addNormalTransform(const mat3& transform);
+	void addNormalObjectTransform(const mat3& transform);
+	void addNormalWorldTransform(const mat3& transform);
 	void addModelTransform(const mat4& transform);
 
 	void switchBoundingBox();
+	void switchFaceNormals();
+	void switchVertexNormals();
 
 	void initBoundingBox();
 
@@ -53,7 +61,8 @@ public:
 
 	mat4 getModelTransform() const;
 	mat4 getWorldTransform() const;
-	mat3 getNormalTransform() const;
+	mat3 getNormalObjectTransform() const;
+	mat3 getNormalWorldTransform() const;
 	
 };
 

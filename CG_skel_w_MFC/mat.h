@@ -1,6 +1,7 @@
 #pragma once
 #include "vec.h"
 #include "assert.h"
+#include <vector>
 
 
 //----------------------------------------------------------------------------
@@ -604,7 +605,7 @@ mat4 RotateZ(const GLfloat theta)
 	return c;
 }
 
-
+bool inverse(const mat4 inputMatrix, mat4& outputMatrix);
 
 //----------------------------------------------------------------------------
 //

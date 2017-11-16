@@ -60,7 +60,7 @@ vec2 vec2fFromStream(std::istream & aStream)
 	return vec2(x, y);
 }
 
-MeshModel::MeshModel(string fileName) : boundingBox(NULL), showBox(false)
+MeshModel::MeshModel(string fileName) : boundingBox(NULL), showBox(false), showFaceNormals(false), showVertexNormals(false)
 {
 	loadFile(fileName);
 }
@@ -74,6 +74,10 @@ void MeshModel::loadFile(string fileName)
 	ifstream ifile(fileName.c_str());
 	vector<FaceIdcs> faces;
 	vector<vec3> vertices;
+	vector<vec3> vertexNormals;
+	vec3 massCenter;
+	vec3 normal;
+	vector<vec3> triangle;
 	// while not end of file
 	while (!ifile.eof())
 	{
@@ -92,6 +96,8 @@ void MeshModel::loadFile(string fileName)
 			vertices.push_back(vec3fFromStream(issLine));
 		else if (lineType == "f") /*BUG?*/
 			faces.push_back(issLine);
+		else if (lineType == "vn")
+			vertexNormals.push_back(normalize(vec3fFromStream(issLine)));
 		else if (lineType == "#" || lineType == "")
 		{
 			// comment / empty line
@@ -113,16 +119,35 @@ void MeshModel::loadFile(string fileName)
 	int k=0;
 	for (vector<FaceIdcs>::iterator it = faces.begin(); it != faces.end(); ++it)
 	{
+		triangle.clear();
 		for (int i = 0; i < 3; i++)
 		{
 			vertex_positions.push_back(vertices[it->v[i] - 1]); /*BUG?*/
+			triangle.push_back(vertices[it->v[i] - 1]); // triangle vertices
+			if (!(vertexNormals.empty())) {
+				vertexNormalPositions.push_back(vertices[it->v[i] - 1]);
+				vertexNormalPositions.push_back(vertexNormals[it->vn[i] - 1]);
+			}
 		}
+		normal = cross(triangle[0] - triangle[2], triangle[1] - triangle[2]);
+		normal = normalize(normal);
+		normalFaces.push_back(normal);
 	}
 }
 
 void MeshModel::switchBoundingBox()
 {
 	showBox = !showBox;
+}
+
+void MeshModel::switchFaceNormals()
+{
+	showFaceNormals = !showFaceNormals;
+}
+
+void MeshModel::switchVertexNormals()
+{
+	showVertexNormals = !showVertexNormals;
 }
 
 
@@ -156,7 +181,9 @@ void MeshModel::initBoundingBox()
 
 	boundingBox->addModelTransform(getModelTransform());
 	boundingBox->addWorldTransform(getWorldTransform());
-	boundingBox->addNormalTransform(getNormalTransform());
+	boundingBox->addNormalObjectTransform(getNormalObjectTransform());
+	boundingBox->addNormalWorldTransform(getNormalWorldTransform());
+
 }
 
 
@@ -172,7 +199,17 @@ void MeshModel::draw(const Renderer& rend, const mat4& cTransform, const mat4& p
 		}
 		rend.DrawCube(&boundingBox->vertex_positions, boundingBox->getModelTransform(), boundingBox->getWorldTransform(), cTransform, projection /*, boundingBox->getNormalTransform()*/);
 	}
-	rend.DrawTriangles(&vertex_positions, _modelTransform, _worldTransform, cTransform, projection);
+	if (showFaceNormals)
+	{
+	}
+	/*
+	if (showVertexNormals)
+	{
+		rend.DrawNormals(&vertexNormalPositions, _normalObjectTransform, _normalWorldTransform, cTransform, projection);
+
+	}
+	*/
+	rend.DrawTriangles(&vertex_positions, _modelTransform, _worldTransform, cTransform, projection, showFaceNormals, _normalWorldTransform * _normalObjectTransform, &normalFaces);
 }
 
 void MeshModel::addWorldTransform(const mat4& transform) 
@@ -180,11 +217,15 @@ void MeshModel::addWorldTransform(const mat4& transform)
 	_worldTransform = transform * _worldTransform;
 }
 
-void MeshModel::addNormalTransform(const mat3& transform)
+void MeshModel::addNormalObjectTransform(const mat3& transform)
 {
-	_normalTransform = transform * _normalTransform;
+	_normalObjectTransform = transform * _normalObjectTransform;
 }
 
+void MeshModel::addNormalWorldTransform(const mat3 & transform)
+{
+	_normalWorldTransform = transform * _normalWorldTransform;
+}
 
 void MeshModel::addModelTransform(const mat4& transform)
 {
@@ -200,10 +241,16 @@ mat4 MeshModel::getWorldTransform() const
 	return mat4(_worldTransform);
 }
 
-mat3 MeshModel::getNormalTransform() const
+mat3 MeshModel::getNormalObjectTransform() const
 {
-	return mat3(_normalTransform);
+	return mat3(_normalObjectTransform);
 }
+
+mat3 MeshModel::getNormalWorldTransform() const
+{
+	return mat3(_normalWorldTransform);
+}
+
 
 float MeshModel::getXmax() const
 {

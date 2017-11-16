@@ -31,10 +31,14 @@ void Camera::LookAt(const vec4& eye, const vec4& at, const vec4& up)
 	cTransform = c * Translate(-eye);
 
 }
-//TODO: not sure if this function is needed
+
 void Camera::addTransformation(const mat4& transform)
 {
-	cTransform = cTransform * transpose(transform);
+mat4 inversed;
+	if (transform, inversed)
+		cTransform = inversed * cTransform;
+	else
+		cout << "Camera::addTransformation error: matrix is non invertable" << endl;
 }
 
 // ORTHO
@@ -45,7 +49,8 @@ void OrthoCamera::setCameraParams(const float left, const float right,
 	setParamsAux(left, right, bottom, top, zNear, zFar);
 	vec3 scaleVec = vec3(2 / (cParams[RIGHT] - cParams[LEFT]), 2 / (cParams[TOP] - cParams[BOTTOM]), 2/(cParams[zNEAR] - cParams[zFAR]));
 	vec3 translateVec = vec3(-(cParams[LEFT] + cParams[RIGHT]) / 2, -(cParams[BOTTOM] + cParams[TOP]) / 2, (cParams[zNEAR] + cParams[zFAR]) / 2);
-	projection = Scale(scaleVec);
+	projection[2][2] = 0;
+	projection = projection * Scale(scaleVec);
 	projection = projection * Translate(translateVec);
 }
 
@@ -58,16 +63,18 @@ void PerspectiveCamera::setCameraParams(const float left, const float right,
 	
 	float alpha = -(cParams[zNEAR] + cParams[zFAR]) / (cParams[zNEAR] - cParams[zFAR]);
 	float betha = -2*(cParams[zNEAR] * cParams[zFAR]) / (cParams[zNEAR] - cParams[zFAR]);
-
+	
 	projection = mat4();
-	projection[0][0] = 2 * cParams[zNEAR] / (cParams[RIGHT] - cParams[LEFT]);
-	projection[1][1] = 2 * cParams[zNEAR] / (cParams[TOP] - cParams[BOTTOM]);
+	projection[0][0] = -2 * cParams[zNEAR] / (cParams[RIGHT] - cParams[LEFT]);
+	projection[1][1] = -2 * cParams[zNEAR] / (cParams[TOP] - cParams[BOTTOM]);
 	projection[2][2] = alpha;
 	projection[3][3] = 0;
 	projection[0][2] = (cParams[LEFT] + cParams[RIGHT]) / (cParams[RIGHT] - cParams[LEFT]);
 	projection[1][2] = (cParams[TOP] + cParams[BOTTOM]) / (cParams[TOP] - cParams[BOTTOM]);
 	projection[2][3] = betha;
 	projection[3][2] = -1;
+	
+	
 
 } 
 
