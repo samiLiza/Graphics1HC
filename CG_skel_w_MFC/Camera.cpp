@@ -31,7 +31,7 @@ void Camera::LookAt(const vec4& eye, const vec4& at, const vec4& up)
 	cTransform = c * Translate(-eye);
 
 }
-
+//TODO: not sure if this function is needed
 void Camera::addTransformation(const mat4& transform)
 {
 	cTransform = cTransform * transpose(transform);

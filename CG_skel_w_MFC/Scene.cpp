@@ -64,7 +64,7 @@ void Scene::addCamera(CameraType type, float left, float right, float bottom, fl
 void Scene::addFovyAspectCamera(float fovy, float aspect, float zNear, float zFar)
 {
 	PerspectiveCamera cam;
-	cam.perspective(30,1,1,100);
+	cam.perspective(fovy,aspect,zNear,zFar);
 	cam.LookAt(vec4(0, 0, 0, 0), vec4(0, 0, -1, 0), vec4(0, 1, 0, 0));
 	cameras.push_back(&cam);
 	activeCamera = cameras.size() - 1;

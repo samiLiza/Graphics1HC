@@ -32,7 +32,7 @@ public:
 	void draw();
 	void drawDemo();
 	void addCamera(CameraType type, float left = -1.0, float right = 1.0, float bottom = -1.0, float top = 1.0, float zNear = -1.0, float zFar = 1.0);
-	void addFovyAspectCamera(float fovy, float aspect, float zNear, float zFar);
+	void addFovyAspectCamera(float fovy = 30.0, float aspect = 1.0, float zNear = 1.0, float zFar = 100.0);
 	void addPrimitive(PrimitiveModelType type, float size = 1.0);
 
 	void translateModel(float x, float y, float z);

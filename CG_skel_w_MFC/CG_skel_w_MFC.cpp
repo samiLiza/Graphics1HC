@@ -24,8 +24,8 @@
 #include <string>
 
 #define BUFFER_OFFSET( offset )   ((GLvoid*) (offset))
-//.start MainMenu
-//--.start Model  menu
+//----.start MainMenu
+//----.start Model menu
 //----.start Add Model Menu
 #define FILE_OPEN 1
 #define ADD_CUBE 2
@@ -37,18 +37,29 @@
 #define BOUNDING_BOX_MODEL 4
 #define FACE_NORMALS_MODEL 5
 #define VERTEX_NORMALS_MODEL 6
+//----.end Model menu
 //----.start World Menu
 #define TRANSLATE_WORLD 1
 #define ROTATE_WORLD 2
 #define SCALE_WORLD 3
 //----.end World Menu
+//----.start Camera menu
 //----.start Add Camera Menu
 #define ADD_ORTHO_CAMERA 1
 #define ADD_PERSPECTIVE_CAMERA 2
 #define ADD_FOVY_ASPECT_CAMERA 3
 //----.end Add Camera Menu
-#define MAIN_DEMO 1
-#define MAIN_ABOUT 2
+#define CAMERA_VIEW_VOLUME 1
+#define CAMERA_FOVY_ASPECT_VIEW_VOLUME 2
+#define CAMERA_TRANSLATE 3
+#define CAMERA_ROTATE 4
+#define ZOOM_IN 5
+#define ZOOM_OUT 6
+#define FOCUS 7
+//----.end Camera Menu
+#define SHOW_HIDE_CAMERAS 1
+#define MAIN_DEMO 2
+#define MAIN_ABOUT 3
 //.end Main Menu
 
 Scene *scene;
@@ -228,7 +239,7 @@ void WorldMenu(int id)
 
 void addCameraMenu(int id)
 {
-	switch(id)
+	switch (id)
 	{
 	case ADD_ORTHO_CAMERA:
 	{
@@ -252,10 +263,10 @@ void addCameraMenu(int id)
 	}
 	case ADD_FOVY_ASPECT_CAMERA:
 	{
-		SetViewVolumeDialog dlg("View Volume Params");
+		SetFovyAspectDialog dlg("View Volume Params");
 		if (dlg.DoModal() == 1)
 		{
-			scene->addCamera(PERSPECTIVE, dlg.left, dlg.right, dlg.bottom, dlg.top, dlg.zNear, dlg.zFar);
+			scene->addFovyAspectCamera(dlg.fovy, dlg.aspect, dlg.zNear, dlg.zFar);
 			scene->draw();
 		}
 		break;
@@ -266,12 +277,47 @@ void addCameraMenu(int id)
 
 void CameraMenu(int id)
 {
+	switch (id) {
+	case CAMERA_VIEW_VOLUME:
+	{
+		break;
+	}
+	case CAMERA_FOVY_ASPECT_VIEW_VOLUME:
+	{
+		break;
+	}
+	case CAMERA_TRANSLATE:
+	{
+		break;
+	}
+	case CAMERA_ROTATE:
+	{
+		break;
+	}
+	case ZOOM_IN:
+	{
+		break;
+	}
+	case ZOOM_OUT:
+	{
+		break;
+	}
+	case FOCUS:
+	{
+		break;
+	}
+
+	}
 }
 
 void mainMenu(int id)
 {
 	switch (id)
 	{
+	case SHOW_HIDE_CAMERAS:
+	{
+		break;
+	}
 	case MAIN_DEMO:
 		scene->drawDemo();
 		break;
@@ -309,11 +355,19 @@ void initMenu()
 	//-- cameraMenu
 	int menuCamera = glutCreateMenu(CameraMenu);
 	glutAddSubMenu("Add..", menuAddCamera);
+	glutAddMenuEntry("Set View Volume", CAMERA_VIEW_VOLUME );
+	glutAddMenuEntry("Set FOVY Aspect View Volume", CAMERA_FOVY_ASPECT_VIEW_VOLUME);
+	glutAddMenuEntry("Translate", CAMERA_TRANSLATE);
+	glutAddMenuEntry("Rotate", CAMERA_ROTATE);
+	glutAddMenuEntry("Zoom In", ZOOM_IN);
+	glutAddMenuEntry("Zoom Out", ZOOM_OUT);
+	glutAddMenuEntry("Focus", FOCUS);
 	//-- mainMenu
 	glutCreateMenu(mainMenu);
 	glutAddSubMenu("Model", menuModel);
 	glutAddSubMenu("World", menuWorld);
 	glutAddSubMenu("Camera", menuCamera);
+	glutAddMenuEntry("Show/Hide Cameras", SHOW_HIDE_CAMERAS);
 	glutAddMenuEntry("Demo",MAIN_DEMO);
 	glutAddMenuEntry("About",MAIN_ABOUT);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
