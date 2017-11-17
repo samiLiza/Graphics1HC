@@ -16,7 +16,7 @@ public:
 class MeshModel 
 {
 protected :
-	MeshModel() : boundingBox(NULL), showBox(false), showFaceNormals(false), showVertexNormals(false) {}
+	MeshModel() : boundingBox(NULL), showBox(false), showFaceNormals(false), showVertexNormals(false), steps(make_pair(0, 0)) {}
 	vector<vec3> vertex_positions;
 	vector<vec3> vertexNormalPositions;
 	vector<vec3> normalFaces;
@@ -26,14 +26,19 @@ protected :
 	mat3 _normalObjectTransform; 
 	mat3 _normalWorldTransform;
 
+	bool showBox;
 	bool showFaceNormals;
 	bool showVertexNormals;
-	bool showBox;
+
+	pair<int, int> steps;
 
 public:
 
-	MeshModel(string fileName);
-	~MeshModel(void);
+	MeshModel(string fileName) : boundingBox(NULL), showBox(false), showFaceNormals(false), showVertexNormals(false), steps(make_pair(0,0))
+	{
+		loadFile(fileName);
+	}
+	~MeshModel(void) {}
 	void loadFile(string fileName);
 	void virtual draw(const Renderer& rend, const mat4& cTransform, const mat4& projection );
 	
@@ -43,6 +48,7 @@ public:
 	void addNormalObjectTransform(const mat3& transform);
 	void addNormalWorldTransform(const mat3& transform);
 	void addModelTransform(const mat4& transform);
+	void addSteps(int xr, int yr);
 
 	void switchBoundingBox();
 	void switchFaceNormals();

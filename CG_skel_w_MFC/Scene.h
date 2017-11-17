@@ -41,6 +41,7 @@ public:
 	void setCameraParams(float left, float right, float bottom, float top, float zNear, float zFar);
 	void setCameraFovyAspect(float fovy, float aspect, float zNear, float zFar);
 	void cameraTranslate(float x, float y, float z);
+	void cameraRotate(float x, float y, float z);
 	void addPrimitive(PrimitiveModelType type, float size = 1.0);
 
 	void scaleModel(float x, float y, float z); // scale active model
@@ -48,6 +49,7 @@ public:
 
 	void translateModel(float x, float y, float z);
 	void translateWorld(float x, float y, float z);
+	void addModelSteps(int xr, int yr);
 	
 	void rotateModelXaxis(float angle);
 	void rotateModelYaxis(float angle);
@@ -56,6 +58,10 @@ public:
 	void rotateWorldXaxis(float angle);
 	void rotateWorldYaxis(float angle);
 	void rotateWorldZaxis(float angle);
+
+	void rotateCameraXaxis(float angle);
+	void rotateCameraYaxis(float angle);
+	void rotateCameraZaxis(float angle);
 
 
 	void switchBoundingBox();

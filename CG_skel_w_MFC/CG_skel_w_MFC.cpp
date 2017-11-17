@@ -100,8 +100,12 @@ void mouse(int button, int state, int x, int y)
 	//set down flags
 	switch(button) {
 		case GLUT_LEFT_BUTTON:
-			lb_down = (state==GLUT_UP)?0:1;
+		{
+			lb_down = (state == GLUT_UP) ? 0 : 1;
+			last_x = x;
+			last_y = y;
 			break;
+		}
 		case GLUT_RIGHT_BUTTON:
 			rb_down = (state==GLUT_UP)?0:1;
 			break;
@@ -121,6 +125,11 @@ void motion(int x, int y)
 	// update last x,y
 	last_x=x;
 	last_y=y;
+	if (lb_down) 
+	{
+		scene->addModelSteps(dx, -dy);
+		scene->draw();
+	}
 }
 
 void addModelMenu(int id)
@@ -413,7 +422,7 @@ int my_main( int argc, char **argv )
 	//----------------------------------------------------------------------------
 	// Initialize window
 	glutInit( &argc, argv );
-	glutInitDisplayMode( GLUT_RGBA| GLUT_DOUBLE);
+	glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE);
 	glutInitWindowSize( 512, 512 );
 	glutInitContextVersion( 3, 2 );
 	glutInitContextProfile( GLUT_CORE_PROFILE );

@@ -60,7 +60,8 @@ void Renderer::SetDemoBuffer()
 
 }
 
-void Renderer::DrawTriangles(const vector<vec3>* vertices, const mat4& mTransform, const mat4& wTransform, const mat4& cTransform, const mat4& projection, bool showFaceNormals, const mat3& nTransform, const vector<vec3>* vertexNormals, const vector<vec3>* faceNormals) const
+void Renderer::DrawTriangles(const vector<vec3>* vertices, const mat4 & mTransform, const mat4 & wTransform, const mat4 & cTransform, const mat4 & projection, bool showFaceNormals, const mat3 & nTransform, 
+	const vector<vec3>* vertexNormals, const vector<vec3>* faceNormals, pair<int, int> steps) const
 {
 	for (int i = 0; i < vertices->size(); i += 3) {
 		vec4 p1 = applyTrasformations(vertices->at(i), mTransform, wTransform, cTransform, projection);
@@ -93,7 +94,7 @@ void Renderer::DrawTriangles(const vector<vec3>* vertices, const mat4& mTransfor
 		DrawLine(p2.x, p2.y, p3.x, p3.y, pixels);
 
 
-		setPixels(pixels);
+		setPixels(pixels, steps);
 	}
 
 }
@@ -136,7 +137,7 @@ void Renderer::DrawTriangles(const vector<vec3>* vertices, const mat4& mTransfor
 */
 
 // ONLY FOR CUBE!!!
-void Renderer::DrawCube(const vector<vec3>* vertices, const mat4& mTransform, const mat4& wTransform, const mat4& cTransform, const mat4& projection, const vector<vec3>* normals) const
+void Renderer::DrawCube(const vector<vec3>* vertices, const mat4& mTransform, const mat4& wTransform, const mat4& cTransform, const mat4& projection, const vector<vec3>* normals, pair<int, int> steps) const
 {
 	if (!vertices) {
 		cout << "DrawCube error: vertices is invalid" << endl;
@@ -166,7 +167,7 @@ void Renderer::DrawCube(const vector<vec3>* vertices, const mat4& mTransform, co
 	DrawLine(tempVertices[2].x, tempVertices[2].y, tempVertices[6].x, tempVertices[6].y, pixels);
 	DrawLine(tempVertices[3].x, tempVertices[3].y, tempVertices[7].x, tempVertices[7].y, pixels);
 
-	setPixels(pixels);
+	setPixels(pixels, steps);
 }
 
 
@@ -358,9 +359,10 @@ vec4 Renderer::applyTrasformations(const vec3& p, const mat4& mTransform, const 
 	return homog;
 
 }
-
-void Renderer::setPixels(vector<Pixel> pixels) const {
+void Renderer::setPixels(vector<Pixel> pixels, pair<int, int> steps) const
+{
 	for (Pixel p : pixels) {
+		p.setCordinates(p.X() + steps.first, p.Y() + steps.second);
 		if (p.X() < 0 || p.X() > (m_width - 1) || p.Y() < 0 || p.Y() > (m_height - 1)) {
 			continue;
 		}

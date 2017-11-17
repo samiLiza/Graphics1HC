@@ -42,7 +42,8 @@ public:
 		ClearDepthBuffer();
 	}
 	//void DrawTriangles(const vector<vec3>* vertices, const mat4& mTransform, const mat4& wTransform, const mat4& cTransform, const mat4& projection, const vector<vec3>* normals=NULL) const;
-	void DrawTriangles(const vector<vec3>* vertices, const mat4& mTransform, const mat4& wTransform, const mat4& cTransform, const mat4& projection, bool showFaceNormals, const mat3& nTransform, const vector<vec3>* vertexNormals = NULL, const vector<vec3>* faceNormals = NULL) const;
+	void DrawTriangles(const vector<vec3>* vertices, const mat4& mTransform, const mat4& wTransform, const mat4& cTransform, const mat4& projection, bool showFaceNormals, const mat3& nTransform,
+		const vector<vec3>* vertexNormals = NULL, const vector<vec3>* faceNormals = NULL, pair<int, int> steps = make_pair(0, 0)) const;
 	
 	void SwapBuffers();
 	void ClearColorBuffer();
@@ -56,11 +57,11 @@ public:
 	void DrawNormals(const vector<vec3>* normals, const mat3& normalModelTransform, const mat3& normalWorldTransform, const mat4& cTransform, const mat4& projection) const;
 	vec3 applyNormalTrasformations(const vec3& p, const mat3& mTransform, const mat3& wTransform, const mat4& cTransform, const mat4& projection) const;
 	
-	void DrawCube(const vector<vec3>* vertices, const mat4& mTransform, const mat4& wTransform, const mat4& cTransform, const mat4& projection, const vector<vec3>* normals = NULL) const;
+	void DrawCube(const vector<vec3>* vertices, const mat4& mTransform, const mat4& wTransform, const mat4& cTransform, const mat4& projection, const vector<vec3>* normals = NULL, pair<int, int> steps = make_pair(0,0)) const;
 	//void setCamera(Camera* camera);
 	void viewPort(vec4& p) const;
 	void viewPort(vec3& p) const;
 	vec4 applyTrasformations(const vec3& p, const mat4& mTransform, const mat4& wTransform, const mat4& cTransform, const mat4& projection) const;
-	void setPixels(vector<Pixel> pixels) const;
+	void setPixels(vector<Pixel> pixels, pair<int, int> steps) const;
 
 };

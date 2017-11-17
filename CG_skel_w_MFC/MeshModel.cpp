@@ -60,15 +60,6 @@ vec2 vec2fFromStream(std::istream & aStream)
 	return vec2(x, y);
 }
 
-MeshModel::MeshModel(string fileName) : boundingBox(NULL), showBox(false), showFaceNormals(false), showVertexNormals(false)
-{
-	loadFile(fileName);
-}
-
-MeshModel::~MeshModel(void)
-{
-}
-
 void MeshModel::loadFile(string fileName)
 {
 	ifstream ifile(fileName.c_str());
@@ -198,27 +189,27 @@ void MeshModel::draw(const Renderer& rend, const mat4& cTransform, const mat4& p
 			// copy all the transformations of the model to the cube
 			initBoundingBox();
 		}
-		rend.DrawCube(&boundingBox->vertex_positions, boundingBox->getModelTransform(), boundingBox->getWorldTransform(), cTransform, projection /*, boundingBox->getNormalTransform()*/);
+		rend.DrawCube(&boundingBox->vertex_positions, boundingBox->getModelTransform(), boundingBox->getWorldTransform(), cTransform, projection, NULL, steps);
 	}
 	if (showFaceNormals && showVertexNormals)
 	{
 		normalTransform = _normalWorldTransform * _normalObjectTransform;
-		rend.DrawTriangles(&vertex_positions, _modelTransform, _worldTransform, cTransform, projection, showFaceNormals, normalTransform, &vertexNormalPositions, &normalFaces);
+		rend.DrawTriangles(&vertex_positions, _modelTransform, _worldTransform, cTransform, projection, showFaceNormals, normalTransform, &vertexNormalPositions, &normalFaces, steps);
 	}
 	else if (showFaceNormals)
 	{
 		normalTransform = _normalWorldTransform * _normalObjectTransform;
-		rend.DrawTriangles(&vertex_positions, _modelTransform, _worldTransform, cTransform, projection, showFaceNormals, normalTransform, NULL, &normalFaces);
+		rend.DrawTriangles(&vertex_positions, _modelTransform, _worldTransform, cTransform, projection, showFaceNormals, normalTransform, NULL, &normalFaces, steps);
 	}
 	else if (showVertexNormals)
 	{
 		normalTransform = _normalWorldTransform * _normalObjectTransform;
-		rend.DrawTriangles(&vertex_positions, _modelTransform, _worldTransform, cTransform, projection, showFaceNormals, normalTransform, &vertexNormalPositions, NULL);
+		rend.DrawTriangles(&vertex_positions, _modelTransform, _worldTransform, cTransform, projection, showFaceNormals, normalTransform, &vertexNormalPositions, NULL, steps);
 	}
 	else
 	{
 		normalTransform = _normalWorldTransform * _normalObjectTransform;
-		rend.DrawTriangles(&vertex_positions, _modelTransform, _worldTransform, cTransform, projection, showFaceNormals, normalTransform);
+		rend.DrawTriangles(&vertex_positions, _modelTransform, _worldTransform, cTransform, projection, showFaceNormals, normalTransform, NULL, NULL, steps);
 	}
 
 }
@@ -241,6 +232,12 @@ void MeshModel::addNormalWorldTransform(const mat3 & transform)
 void MeshModel::addModelTransform(const mat4& transform)
 {
 	_modelTransform = transform * _modelTransform;
+}
+
+void MeshModel::addSteps(int xr, int yr)
+{
+	steps.first += xr;
+	steps.second += yr;
 }
 
 mat4 MeshModel::getModelTransform() const

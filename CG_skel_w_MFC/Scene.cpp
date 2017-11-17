@@ -56,7 +56,8 @@ void Scene::addCamera(CameraType type, float left, float right, float bottom, fl
 	}
 
 	cam->setCameraParams(left, right, bottom, top, zNear, zFar);
-	cam->LookAt(vec4(10, 0, 2, 0), vec4(0, 0, 0, 0), vec4(0, 1, 0, 0));
+	cam->LookAt(vec4(0, 0, 10, 0), vec4(0, 0, 0, 0), vec4(0, 1, 0, 0));
+	//cam->LookAt(vec4(10, 0, 2, 0), vec4(0, 0, 0, 0), vec4(0, 1, 0, 0));
 	cameras.push_back(cam);
 	activeCamera = cameras.size() - 1;
 }
@@ -214,6 +215,12 @@ void Scene::translateWorld(float x, float y, float z)
 
 		// ToDo add transform to vertex normals
 	}
+}
+
+void Scene::addModelSteps(int xr, int yr)
+{
+	MeshModel* model = models[activeModel];
+	model->addSteps(xr, yr);
 }
 
 // Rotation!!!
