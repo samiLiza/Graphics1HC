@@ -24,6 +24,7 @@ protected:
 public:
 	virtual ~Camera() {}
 	void addTransformation(const mat4& transform);
+	void addInversedTransformation(const mat4& inversed);
 	
 	void LookAt(const vec4& eye, const vec4& at, const vec4& up);
 	
@@ -33,6 +34,8 @@ public:
 
 	void virtual perspective(const float fovy, const float aspect,
 		const float zNear, const float zFar) = 0;
+
+	void reshape(float wRatio, float hRatio);
 
 	mat4 getCameraTransform() {
 		return cTransform;

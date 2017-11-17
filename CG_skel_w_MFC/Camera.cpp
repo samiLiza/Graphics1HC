@@ -32,13 +32,27 @@ void Camera::LookAt(const vec4& eye, const vec4& at, const vec4& up)
 
 }
 
+void Camera::reshape(float wRatio, float hRatio)
+{
+	float left = cParams[LEFT] * wRatio;
+	float right = cParams[RIGHT] * wRatio;
+	float bottom = cParams[BOTTOM] * hRatio;
+	float top = cParams[TOP] * hRatio;
+	setCameraParams(left, right, bottom, top, cParams[zNEAR], cParams[zFAR]);
+}
+
 void Camera::addTransformation(const mat4& transform)
 {
 mat4 inversed;
-	if (transform, inversed)
+	if (inverse(transform, inversed))
 		cTransform = inversed * cTransform;
 	else
 		cout << "Camera::addTransformation error: matrix is non invertable" << endl;
+}
+
+void Camera::addInversedTransformation(const mat4 & inversed)
+{
+	cTransform = inversed * cTransform;
 }
 
 // ORTHO
@@ -73,9 +87,6 @@ void PerspectiveCamera::setCameraParams(const float left, const float right,
 	projection[1][2] = (cParams[TOP] + cParams[BOTTOM]) / (cParams[TOP] - cParams[BOTTOM]);
 	projection[2][3] = betha;
 	projection[3][2] = -1;
-	
-	
-
 } 
 
 void PerspectiveCamera::perspective(const float fovy, const float aspect,

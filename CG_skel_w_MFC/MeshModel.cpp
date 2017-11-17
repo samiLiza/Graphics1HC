@@ -190,6 +190,7 @@ void MeshModel::initBoundingBox()
 void MeshModel::draw(const Renderer& rend, const mat4& cTransform, const mat4& projection)
 {
 	// ToDo: think about normal
+	mat3 normalTransform;
 	if (showBox)
 	{
 		if (!boundingBox) {
@@ -199,17 +200,27 @@ void MeshModel::draw(const Renderer& rend, const mat4& cTransform, const mat4& p
 		}
 		rend.DrawCube(&boundingBox->vertex_positions, boundingBox->getModelTransform(), boundingBox->getWorldTransform(), cTransform, projection /*, boundingBox->getNormalTransform()*/);
 	}
-	if (showFaceNormals)
+	if (showFaceNormals && showVertexNormals)
 	{
+		normalTransform = _normalWorldTransform * _normalObjectTransform;
+		rend.DrawTriangles(&vertex_positions, _modelTransform, _worldTransform, cTransform, projection, showFaceNormals, normalTransform, &vertexNormalPositions, &normalFaces);
 	}
-	/*
-	if (showVertexNormals)
+	else if (showFaceNormals)
 	{
-		rend.DrawNormals(&vertexNormalPositions, _normalObjectTransform, _normalWorldTransform, cTransform, projection);
+		normalTransform = _normalWorldTransform * _normalObjectTransform;
+		rend.DrawTriangles(&vertex_positions, _modelTransform, _worldTransform, cTransform, projection, showFaceNormals, normalTransform, NULL, &normalFaces);
+	}
+	else if (showVertexNormals)
+	{
+		normalTransform = _normalWorldTransform * _normalObjectTransform;
+		rend.DrawTriangles(&vertex_positions, _modelTransform, _worldTransform, cTransform, projection, showFaceNormals, normalTransform, &vertexNormalPositions, NULL);
+	}
+	else
+	{
+		normalTransform = _normalWorldTransform * _normalObjectTransform;
+		rend.DrawTriangles(&vertex_positions, _modelTransform, _worldTransform, cTransform, projection, showFaceNormals, normalTransform);
+	}
 
-	}
-	*/
-	rend.DrawTriangles(&vertex_positions, _modelTransform, _worldTransform, cTransform, projection, showFaceNormals, _normalWorldTransform * _normalObjectTransform, &normalFaces);
 }
 
 void MeshModel::addWorldTransform(const mat4& transform) 
@@ -315,4 +326,49 @@ float MeshModel::getZmin()const
 	return zMin;
 }
 
+
+PrimitiveCube::PrimitiveCube(float size)
+{
+	vector<vec3> vertices;
+	vec3 massCenter;
+	vec3 normal;
+	vector<vec3> triangle;
+	vector<FaceIdcs> faces;
+
+	/*1*/vertices.push_back(size * vec3(0.0, 0.0, 0.0));
+	/*2*/vertices.push_back(size * vec3(0.0, 0.0, 1.0));
+	/*3*/vertices.push_back(size * vec3(0.0, 1.0, 0.0));
+	/*4*/vertices.push_back(size * vec3(0.0, 1.0, 1.0));
+
+	/*5*/vertices.push_back(size * vec3(1.0, 0.0, 0.0));
+	/*6*/vertices.push_back(size * vec3(1.0, 0.0, 1.0));
+	/*7*/vertices.push_back(size * vec3(1.0, 1.0, 0.0));
+	/*8*/vertices.push_back(size * vec3(1.0, 1.0, 1.0));
+
+	faces.push_back(FaceIdcs(istringstream("1 7 5")));
+	faces.push_back(FaceIdcs(istringstream("1 3 7")));
+	faces.push_back(FaceIdcs(istringstream("1 4 3")));
+	faces.push_back(FaceIdcs(istringstream("1 2 4")));
+	faces.push_back(FaceIdcs(istringstream("3 8 7")));
+	faces.push_back(FaceIdcs(istringstream("3 4 8")));
+	faces.push_back(FaceIdcs(istringstream("5 7 8")));
+	faces.push_back(FaceIdcs(istringstream("5 8 6")));
+	faces.push_back(FaceIdcs(istringstream("1 5 6")));
+	faces.push_back(FaceIdcs(istringstream("1 6 2")));
+	faces.push_back(FaceIdcs(istringstream("2 6 8")));
+	faces.push_back(FaceIdcs(istringstream("2 8 4")));
+
+	for (vector<FaceIdcs>::iterator it = faces.begin(); it != faces.end(); ++it)
+	{
+		triangle.clear();
+		for (int i = 0; i < 3; i++)
+		{
+			vertex_positions.push_back(vertices[it->v[i] - 1]); /*BUG?*/
+			triangle.push_back(vertices[it->v[i] - 1]); // triangle vertices
+		}
+		normal = cross(triangle[0] - triangle[2], triangle[1] - triangle[2]);
+		normal = normalize(normal);
+		normalFaces.push_back(normal);
+	}
+}
 

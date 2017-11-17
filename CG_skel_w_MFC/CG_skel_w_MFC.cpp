@@ -79,7 +79,8 @@ void display()
 
 void reshape( int width, int height )
 {
-//update the renderer's buffers
+	scene->reshape(width, height);
+	scene->draw();
 }
 
 void keyboard( unsigned char key, int x, int y )
@@ -129,7 +130,7 @@ void addModelMenu(int id)
 		case FILE_OPEN:
 		{
 			CFileDialog dlg(TRUE, _T(".obj"), NULL, NULL, _T("*.obj|*.*"));
-			if (dlg.DoModal() == 1)
+			if (dlg.DoModal() == IDOK)
 			{
 				std::string s((LPCTSTR)dlg.GetPathName());
 				scene->loadOBJModel((LPCTSTR)dlg.GetPathName());
@@ -158,7 +159,7 @@ void ModelMenu(int id)
 	case TRANSLATE_MODEL:
 	{
 		SetXYZDialog dlg("Translation Params", 0);
-		if (dlg.DoModal() == 1)
+		if (dlg.DoModal() == IDOK)
 		{
 			scene->translateModel(dlg.x, dlg.y, dlg.z);
 			scene->draw();
@@ -168,14 +169,20 @@ void ModelMenu(int id)
 
 	case ROTATE_MODEL:
 	{
-		//TODO: call scene->rotateModel(..);
-		scene->draw();
+		SetXYZDialog dlg("Rotation Angle Around Axis (Degrees)", 0);
+		if (dlg.DoModal() == IDOK)
+		{
+			scene->rotateModelXaxis(dlg.x);
+			scene->rotateModelYaxis(dlg.y);
+			scene->rotateModelZaxis(dlg.z);
+			scene->draw();
+		}
 		break;
 	}
 	case SCALE_MODEL:
 	{
 		SetXYZDialog dlg("Scale Params", 1);
-		if (dlg.DoModal() == 1)
+		if (dlg.DoModal() == IDOK)
 		{
 			scene->scaleModel(dlg.x, dlg.y, dlg.z);
 			scene->draw();
@@ -211,7 +218,7 @@ void WorldMenu(int id)
 	case TRANSLATE_WORLD:
 	{
 		SetXYZDialog dlg("Translation Params", 0);
-		if (dlg.DoModal() == 1)
+		if (dlg.DoModal() == IDOK)
 		{
 			scene->translateWorld(dlg.x, dlg.y, dlg.z);
 			scene->draw();
@@ -221,13 +228,20 @@ void WorldMenu(int id)
 
 	case ROTATE_WORLD:
 	{
-		scene->draw();
+		SetXYZDialog dlg("Rotation Angle Around Axis (Degrees)", 0);
+		if (dlg.DoModal() == IDOK)
+		{
+			scene->rotateWorldXaxis(dlg.x);
+			scene->rotateWorldYaxis(dlg.y);
+			scene->rotateWorldZaxis(dlg.z);
+			scene->draw();
+		}
 		break;
 	}
 	case SCALE_WORLD:
 	{
 		SetXYZDialog dlg("Scale Params", 1);
-		if (dlg.DoModal() == 1)
+		if (dlg.DoModal() == IDOK)
 		{
 			scene->scaleWorld(dlg.x, dlg.y, dlg.z);
 			scene->draw();
@@ -244,7 +258,7 @@ void addCameraMenu(int id)
 	case ADD_ORTHO_CAMERA:
 	{
 		SetViewVolumeDialog dlg("View Volume Params");
-		if (dlg.DoModal() == 1)
+		if (dlg.DoModal() == IDOK)
 		{
 			scene->addCamera(ORTHOGONAL, dlg.left, dlg.right, dlg.bottom, dlg.top, dlg.zNear, dlg.zFar);
 			scene->draw();
@@ -254,7 +268,7 @@ void addCameraMenu(int id)
 	case ADD_PERSPECTIVE_CAMERA:
 	{
 		SetViewVolumeDialog dlg("View Volume Params");
-		if (dlg.DoModal() == 1)
+		if (dlg.DoModal() == IDOK)
 		{
 			scene->addCamera(PERSPECTIVE, dlg.left, dlg.right, dlg.bottom, dlg.top, dlg.zNear, dlg.zFar);
 			scene->draw();
@@ -264,7 +278,7 @@ void addCameraMenu(int id)
 	case ADD_FOVY_ASPECT_CAMERA:
 	{
 		SetFovyAspectDialog dlg("View Volume Params");
-		if (dlg.DoModal() == 1)
+		if (dlg.DoModal() == IDOK)
 		{
 			scene->addFovyAspectCamera(dlg.fovy, dlg.aspect, dlg.zNear, dlg.zFar);
 			scene->draw();
@@ -280,14 +294,32 @@ void CameraMenu(int id)
 	switch (id) {
 	case CAMERA_VIEW_VOLUME:
 	{
+		SetViewVolumeDialog dlg("View Volume Params");
+		if (dlg.DoModal() == IDOK)
+		{
+			scene->setCameraParams(dlg.left, dlg.right, dlg.bottom, dlg.top, dlg.zNear, dlg.zFar);
+			scene->draw();
+		}
 		break;
 	}
 	case CAMERA_FOVY_ASPECT_VIEW_VOLUME:
 	{
+		SetFovyAspectDialog dlg("View Volume Params");
+		if (dlg.DoModal() == IDOK)
+		{
+			scene->setCameraFovyAspect(dlg.fovy, dlg.aspect, dlg.zNear, dlg.zFar);
+			scene->draw();
+		}
 		break;
 	}
 	case CAMERA_TRANSLATE:
 	{
+		SetXYZDialog dlg("Translation Params", 0);
+		if (dlg.DoModal() == IDOK)
+		{
+			scene->cameraTranslate(dlg.x, dlg.y, dlg.z);
+			scene->draw();
+		}
 		break;
 	}
 	case CAMERA_ROTATE:

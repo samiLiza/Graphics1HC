@@ -199,3 +199,38 @@ BEGIN_MESSAGE_MAP(SetFovyAspectDialog, CommonInputDialog)
 	ON_WM_CREATE()
 	ON_WM_PAINT()
 END_MESSAGE_MAP()
+
+/*
+	OneInputDialog
+*/
+
+void OneInputDialog::DoDataExchange(CDataExchange * pDX)
+{
+	CommonInputDialog::DoDataExchange(pDX);
+
+	DDX_Text(pDX, DX_PARAM_1, x);
+}
+
+int OneInputDialog::OnCreate(LPCREATESTRUCT lpcs)
+{
+	xEdit.Create(ES_MULTILINE | WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER,
+		CRect(100, 30, 250, 50), this, DX_PARAM_1);
+
+	return 0;
+}
+
+void OneInputDialog::OnPaint()
+{
+	CPaintDC dc(this);
+	dc.SetBkMode(TRANSPARENT);
+
+	CRect l_rect(10, 32, 450, 100);
+	dc.DrawText(name, -1, &l_rect, DT_SINGLELINE);
+
+	xEdit.SetFocus();
+}
+
+BEGIN_MESSAGE_MAP(OneInputDialog, CommonInputDialog)
+	ON_WM_CREATE()
+	ON_WM_PAINT()
+END_MESSAGE_MAP()

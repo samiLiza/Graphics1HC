@@ -5,8 +5,6 @@
 #define IDS_APP_TITLE                   103
 #define IDD_DIALOG1                     110
 #define IDD_DIALOG2                     112
-#define IDOK                            1008
-#define IDCANCEL                        1009
 
 // Next default values for new objects
 // 

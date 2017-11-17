@@ -56,6 +56,25 @@ public:
 	float x, y, z;
 };
 /*
+	OneInputDialog
+*/
+class OneInputDialog : public CommonInputDialog
+{
+	CEdit xEdit;
+	CString name;
+
+	virtual void DoDataExchange(CDataExchange* pDX);
+	afx_msg int OnCreate(LPCREATESTRUCT lpcs);
+	afx_msg void OnPaint();
+	DECLARE_MESSAGE_MAP()
+
+public:
+	OneInputDialog(CString name, CString title = "Set X") : CommonInputDialog(title), name(name), x(0) {}
+	virtual ~OneInputDialog() {}
+
+	float x;
+};
+/*
 
 	SetViewVolumeDialog
 

@@ -60,8 +60,47 @@ void Renderer::SetDemoBuffer()
 
 }
 
+void Renderer::DrawTriangles(const vector<vec3>* vertices, const mat4& mTransform, const mat4& wTransform, const mat4& cTransform, const mat4& projection, bool showFaceNormals, const mat3& nTransform, const vector<vec3>* vertexNormals, const vector<vec3>* faceNormals) const
+{
+	for (int i = 0; i < vertices->size(); i += 3) {
+		vec4 p1 = applyTrasformations(vertices->at(i), mTransform, wTransform, cTransform, projection);
+		vec4 p2 = applyTrasformations(vertices->at(i + 1), mTransform, wTransform, cTransform, projection);
+		vec4 p3 = applyTrasformations(vertices->at(i + 2), mTransform, wTransform, cTransform, projection);
+
+		vector<Pixel> pixels;
+		if (faceNormals) {
+			vec3 mc = (vertices->at(i) + vertices->at(i + 1) + vertices->at(i + 2)) / 3;
+			vec4 mcTransformed = applyTrasformations(mc, mTransform, wTransform, cTransform, projection);
+			vec4 normal = vec4(normalize(nTransform * (*faceNormals)[i / 3]));
+			normal *= 15;
+			normal.w = 0;
+			viewPort(mcTransformed);
+			viewPort(mcTransformed + normal);
+			DrawLine(mcTransformed.x, mcTransformed.y, mcTransformed.x + normal.x, mcTransformed.y + normal.y, pixels, 1, 0, 0);
+		}
+		// ToDo: finish vertex normals
+		if (vertexNormals)
+		{
+
+		}
+		viewPort(p1);
+		viewPort(p2);
+		viewPort(p3);
+
+
+		DrawLine(p1.x, p1.y, p2.x, p2.y, pixels);
+		DrawLine(p1.x, p1.y, p3.x, p3.y, pixels);
+		DrawLine(p2.x, p2.y, p3.x, p3.y, pixels);
+
+
+		setPixels(pixels);
+	}
+
+}
+
 // get rip of bool value, check if normals NULL instead
 // add normals for cube primitive
+/*
 void Renderer::DrawTriangles(const vector<vec3>* vertices, const mat4& mTransform, const mat4& wTransform, const mat4& cTransform, const mat4& projection, bool showFaceNormals, const mat3& nTransform, const vector<vec3>* normals) const
 {
 	for (int i = 0; i < vertices->size(); i += 3) {
@@ -94,39 +133,8 @@ void Renderer::DrawTriangles(const vector<vec3>* vertices, const mat4& mTransfor
 	}
 
 }
-
-/*
-void Renderer::DrawNormals(const vector<vec3>* normals, const mat3 & normalModelTransform, const mat3 & normalWorldTransform, const mat4 & cTransform, const mat4 & projection) const
-{
-	
-	for (int i = 0; i < normals->size(); i += 2) {
-		vec3 p1 = applyNormalTrasformations(normals->at(i), normalModelTransform, normalWorldTransform, cTransform, projection);
-		vec3 p2 = applyNormalTrasformations(normals->at(i + 1), normalModelTransform, normalWorldTransform, cTransform, projection);
-		viewPort(p1);
-		viewPort(p2);
-		vector<Pixel> pixels;
-		DrawLine(p1.x, p1.y, p1.x + p2.x, p1.y + p2.y, pixels);
-		setPixels(pixels);
-
-	}
-	
-}
-
 */
-/*
-vec3 Renderer::applyNormalTrasformations(const vec3 & from, const vec3 & normal, const mat3 & mTransform, const mat3 & wTransform, const mat4 & cTransform, const mat4 & projection) const
-{
-	vec3 vertex(p);
-	mat3 cTransformReduced = mat3(cTransform[0][0], cTransform[1][0], cTransform[2][0], cTransform[0][1], cTransform[1][1], cTransform[2][1], cTransform[0][2], cTransform[1][2], cTransform[2][2]);
-	mat3 projectionReduced = mat3(projection[0][0], projection[1][0], projection[2][0], projection[0][1], projection[1][1], projection[2][1], projection[0][2], projection[1][2], projection[2][2]);
-	vertex = mTransform * vertex; //model
-	vertex = wTransform * vertex; //world
-	vertex = cTransformReduced * vertex; //camera
-	vertex = projectionReduced * vertex; //camera
-	
-	return vertex;
-}
-*/
+
 // ONLY FOR CUBE!!!
 void Renderer::DrawCube(const vector<vec3>* vertices, const mat4& mTransform, const mat4& wTransform, const mat4& cTransform, const mat4& projection, const vector<vec3>* normals) const
 {
@@ -160,12 +168,6 @@ void Renderer::DrawCube(const vector<vec3>* vertices, const mat4& mTransform, co
 
 	setPixels(pixels);
 }
-
-//void Renderer::setCamera(Camera* camera) 
-//{
-	//assert(camera);
-	//this->activeCamera = camera;
-//}
 
 
 

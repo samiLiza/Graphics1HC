@@ -42,7 +42,7 @@ public:
 		ClearDepthBuffer();
 	}
 	//void DrawTriangles(const vector<vec3>* vertices, const mat4& mTransform, const mat4& wTransform, const mat4& cTransform, const mat4& projection, const vector<vec3>* normals=NULL) const;
-	void DrawTriangles(const vector<vec3>* vertices, const mat4& mTransform, const mat4& wTransform, const mat4& cTransform, const mat4& projection, bool showFaceNormals, const mat3& nTransform, const vector<vec3>* normals = NULL) const;
+	void DrawTriangles(const vector<vec3>* vertices, const mat4& mTransform, const mat4& wTransform, const mat4& cTransform, const mat4& projection, bool showFaceNormals, const mat3& nTransform, const vector<vec3>* vertexNormals = NULL, const vector<vec3>* faceNormals = NULL) const;
 	
 	void SwapBuffers();
 	void ClearColorBuffer();

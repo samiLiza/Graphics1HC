@@ -69,8 +69,6 @@ public:
 class Cube : public MeshModel
 {
 	
-
-
 public:
 	Cube(float size = 1.0)
 	{
@@ -83,10 +81,19 @@ public:
 		/*6*/vertex_positions.push_back(size * vec3(1.0, -1.0, -1.0));
 		/*7*/vertex_positions.push_back(size * vec3(-1.0, -1.0, 1.0));
 		/*8*/vertex_positions.push_back(size * vec3(-1.0, -1.0, -1.0));
+
 	};
 
 	Cube(const vector<vec3>* vertices);
 
 	void virtual draw(const Renderer& rend, const mat4& cTransform, const mat4& projection) override;
 
+};
+
+class PrimitiveCube : public MeshModel
+{
+
+public:
+	PrimitiveCube(float size = 1.0);
+	
 };
