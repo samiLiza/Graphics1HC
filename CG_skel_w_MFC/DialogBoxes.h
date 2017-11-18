@@ -69,7 +69,7 @@ class OneInputDialog : public CommonInputDialog
 	DECLARE_MESSAGE_MAP()
 
 public:
-	OneInputDialog(CString name, CString title = "Set X") : CommonInputDialog(title), name(name), x(0) {}
+	OneInputDialog(CString name, CString title = "Set X") : CommonInputDialog(title), name(name), x(1.0) {}
 	virtual ~OneInputDialog() {}
 
 	float x;

@@ -29,7 +29,6 @@
 //----.start Add Model Menu
 #define FILE_OPEN 1
 #define ADD_CUBE 2
-#define ADD_PYRAMID 3
 //----.end Add Model Menu
 #define TRANSLATE_MODEL 1
 #define ROTATE_MODEL 2
@@ -53,11 +52,10 @@
 #define CAMERA_FOVY_ASPECT_VIEW_VOLUME 2
 #define CAMERA_TRANSLATE 3
 #define CAMERA_ROTATE 4
-#define ZOOM_IN 5
-#define ZOOM_OUT 6
+#define ZOOM 5
 #define FOCUS 7
+#define SHOW_HIDE_CAMERAS 8
 //----.end Camera Menu
-#define SHOW_HIDE_CAMERAS 1
 #define MAIN_DEMO 2
 #define MAIN_ABOUT 3
 //.end Main Menu
@@ -74,7 +72,7 @@ bool lb_down,rb_down,mb_down;
 void display()
 {
 //Call the scene and ask it to draw itself
-	scene->draw();
+	//scene->draw();
 }
 
 void reshape( int width, int height )
@@ -149,12 +147,12 @@ void addModelMenu(int id)
 
 		case ADD_CUBE:
 		{
-			scene->addPrimitive(CUBE);
-			break;
-		}
-		case ADD_PYRAMID:
-		{
-			scene->addPrimitive(PYRAMID);
+			OneInputDialog dlg("Cube Size");
+			if (dlg.DoModal() == IDOK)
+			{
+				scene->addPrimitive(CUBE, dlg.x);
+				scene->draw();
+			}
 			break;
 		}
 
@@ -333,18 +331,38 @@ void CameraMenu(int id)
 	}
 	case CAMERA_ROTATE:
 	{
+		SetXYZDialog dlg("Rotation Angle Around Axis (Degrees)", 0);
+		if (dlg.DoModal() == IDOK)
+		{
+			scene->cameraRotate(dlg.x, dlg.y, dlg.z);
+			scene->draw();
+		}
 		break;
 	}
-	case ZOOM_IN:
+	case ZOOM:
 	{
+		OneInputDialog dlg("Zoom Rate (Percentage)");
+		if (dlg.DoModal() == IDOK)
+		{
+			if (dlg.x == 0)
+				break;
+			scene->zoom(100/dlg.x);
+			scene->draw();
+		}
 		break;
 	}
-	case ZOOM_OUT:
-	{
-		break;
-	}
+
 	case FOCUS:
 	{
+		scene->lookAtActiveModel();
+		scene->draw();
+		break;
+	}
+
+	case SHOW_HIDE_CAMERAS:
+	{
+		scene->renderCamera();
+		scene->draw();
 		break;
 	}
 
@@ -355,10 +373,6 @@ void mainMenu(int id)
 {
 	switch (id)
 	{
-	case SHOW_HIDE_CAMERAS:
-	{
-		break;
-	}
 	case MAIN_DEMO:
 		scene->drawDemo();
 		break;
@@ -373,7 +387,6 @@ void initMenu()
 	int menuAddModel = glutCreateMenu(addModelMenu);
 	glutAddMenuEntry("Open File",FILE_OPEN);
 	glutAddMenuEntry("Add Cube", ADD_CUBE);
-	glutAddMenuEntry("Add Pyramid", ADD_PYRAMID);
 	//-- menuModel
 	int menuModel = glutCreateMenu(ModelMenu);
 	glutAddSubMenu("Add..", menuAddModel);
@@ -400,15 +413,14 @@ void initMenu()
 	glutAddMenuEntry("Set FOVY Aspect View Volume", CAMERA_FOVY_ASPECT_VIEW_VOLUME);
 	glutAddMenuEntry("Translate", CAMERA_TRANSLATE);
 	glutAddMenuEntry("Rotate", CAMERA_ROTATE);
-	glutAddMenuEntry("Zoom In", ZOOM_IN);
-	glutAddMenuEntry("Zoom Out", ZOOM_OUT);
+	glutAddMenuEntry("Zoom", ZOOM);
 	glutAddMenuEntry("Focus", FOCUS);
+	glutAddMenuEntry("Show/Hide Camera", SHOW_HIDE_CAMERAS);
 	//-- mainMenu
 	glutCreateMenu(mainMenu);
 	glutAddSubMenu("Model", menuModel);
 	glutAddSubMenu("World", menuWorld);
 	glutAddSubMenu("Camera", menuCamera);
-	glutAddMenuEntry("Show/Hide Cameras", SHOW_HIDE_CAMERAS);
 	glutAddMenuEntry("Demo",MAIN_DEMO);
 	glutAddMenuEntry("About",MAIN_ABOUT);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);

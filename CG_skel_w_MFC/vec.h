@@ -439,6 +439,12 @@ struct vec4 {
 		return *this;
 	}
 
+	bool operator < (const vec4& v)
+	{
+		float thisLen = std::sqrt(x*x + y*y + z*z + w*w);
+		float vLen = std::sqrt(v.x*v.x + v.y*v.y + v.z*v.z + v.w*v.w);
+		return thisLen < vLen;
+	}
 	//
 	//  --- Insertion and Extraction Operators ---
 	//

@@ -9,11 +9,9 @@ Cube::Cube(const vector<vec3>* vertices)
 		vertex_positions.push_back((*vertices)[i]);
 }
 
-void Cube::draw(const Renderer& rend, const mat4& cTransform, const mat4& projection)
+void Cube::draw(const Renderer& rend, const mat4& cTransform, const mat4& projection, bool active)
 {
-
 		rend.DrawCube(&vertex_positions, _modelTransform, _worldTransform, cTransform, projection, NULL, steps);
-
 }
 
 

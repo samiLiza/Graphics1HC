@@ -15,14 +15,19 @@ protected:
 	mat4 cTransform; // to camera frame
 	mat4 cNormalize;
 	mat4 projection; 
-	map<CameraParams, float> cParams;
+	bool renderIt;
 
 	void setParamsAux(const float left, const float right,
 		const float bottom, const float top,
 		const float zNear, const float zFar);
 
 public:
+	Camera() : renderIt(false) {};
 	virtual ~Camera() {}
+	map<CameraParams, float> cParams;
+	vec4 cameraPosition;
+	vec4 up;
+
 	void addTransformation(const mat4& transform);
 	void addInversedTransformation(const mat4& inversed);
 	
@@ -36,6 +41,9 @@ public:
 		const float zNear, const float zFar) = 0;
 
 	void reshape(float wRatio, float hRatio);
+	void switchRenderIt();
+	bool getRenderIt();
+
 
 	mat4 getCameraTransform() {
 		return cTransform;

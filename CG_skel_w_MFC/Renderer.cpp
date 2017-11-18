@@ -61,15 +61,19 @@ void Renderer::SetDemoBuffer()
 }
 
 void Renderer::DrawTriangles(const vector<vec3>* vertices, const mat4 & mTransform, const mat4 & wTransform, const mat4 & cTransform, const mat4 & projection, bool showFaceNormals, const mat3 & nTransform, 
-	const vector<vec3>* vertexNormals, const vector<vec3>* faceNormals, pair<int, int> steps) const
+	bool active, const vector<vec3>* vertexNormals, const vector<vec3>* faceNormals, pair<int, int> steps) const
 {
+	int green = 1, blue = 0, red;
+	red = (active) ? 0 : 1;
+	
 	for (int i = 0; i < vertices->size(); i += 3) {
-		vec4 p1 = applyTrasformations(vertices->at(i), mTransform, wTransform, cTransform, projection);
-		vec4 p2 = applyTrasformations(vertices->at(i + 1), mTransform, wTransform, cTransform, projection);
-		vec4 p3 = applyTrasformations(vertices->at(i + 2), mTransform, wTransform, cTransform, projection);
+		vec4 p[3];
+		p[0] = applyTrasformations(vertices->at(i), mTransform, wTransform, cTransform, projection);
+		p[1] = applyTrasformations(vertices->at(i + 1), mTransform, wTransform, cTransform, projection);
+		p[2] = applyTrasformations(vertices->at(i + 2), mTransform, wTransform, cTransform, projection);
 
 		vector<Pixel> pixels;
-		if (faceNormals) {
+		if (faceNormals && faceNormals->size()) {
 			vec3 mc = (vertices->at(i) + vertices->at(i + 1) + vertices->at(i + 2)) / 3;
 			vec4 mcTransformed = applyTrasformations(mc, mTransform, wTransform, cTransform, projection);
 			vec4 normal = vec4(normalize(nTransform * (*faceNormals)[i / 3]));
@@ -79,24 +83,51 @@ void Renderer::DrawTriangles(const vector<vec3>* vertices, const mat4 & mTransfo
 			viewPort(mcTransformed + normal);
 			DrawLine(mcTransformed.x, mcTransformed.y, mcTransformed.x + normal.x, mcTransformed.y + normal.y, pixels, 1, 0, 0);
 		}
-		// ToDo: finish vertex normals
-		if (vertexNormals)
+		viewPort(p[0]);
+		viewPort(p[1]);
+		viewPort(p[2]);
+
+		if (vertexNormals && vertexNormals->size())
 		{
-
+			for (int j = 0; j < 3; j++) 
+			{
+				vec4 vertexNormal = vec4(normalize(nTransform * (*vertexNormals)[i]));
+				vertexNormal *= 3;
+				vertexNormal.w = 0;
+				viewPort(p[j] + vertexNormal);
+				DrawLine(p[j].x, p[j].y, p[j].x + vertexNormal.x, p[j].y + vertexNormal.y, pixels, 1, 0, 1);
+			}
 		}
-		viewPort(p1);
-		viewPort(p2);
-		viewPort(p3);
 
-
-		DrawLine(p1.x, p1.y, p2.x, p2.y, pixels);
-		DrawLine(p1.x, p1.y, p3.x, p3.y, pixels);
-		DrawLine(p2.x, p2.y, p3.x, p3.y, pixels);
+		DrawLine(p[0].x, p[0].y, p[1].x, p[1].y, pixels, red, green, blue);
+		DrawLine(p[0].x, p[0].y, p[2].x, p[2].y, pixels, red, green, blue);
+		DrawLine(p[1].x, p[1].y, p[2].x, p[2].y, pixels, red, green, blue);
 
 
 		setPixels(pixels, steps);
 	}
 
+}
+
+void Renderer::DrawCamera(const vec4& cameraPosition, const mat4 & cTransform, const mat4 & activeCTransform, const mat4 & projection)
+{
+	// ToDo: check again
+	vector<Pixel> pixels;
+	mat4 cTransformInversed;
+	if (inverse(cTransform, cTransformInversed)) {
+		mat4 identity;
+		float delta = 0.5;
+		vec3 cameraPos3d = vec3(cameraPosition.x, cameraPosition.y, cameraPosition.z);
+		if (!(cameraPosition.w < 0.00001))
+			cameraPos3d /= cameraPosition.w;
+		vec4 p1 = applyTrasformations(cameraPos3d, identity, cTransformInversed, activeCTransform, projection);
+
+		viewPort(p1); 
+		DrawLine(p1.x + 10, p1.y, p1.x-10, p1.y, pixels, 1, 0, 1);
+		DrawLine(p1.x, p1.y+10, p1.x, p1.y-10, pixels, 1, 0, 1);
+
+		setPixels(pixels);
+	}
 }
 
 // get rip of bool value, check if normals NULL instead
@@ -152,20 +183,20 @@ void Renderer::DrawCube(const vector<vec3>* vertices, const mat4& mTransform, co
 		tempVertices.push_back(p);
 	}
 
-	DrawLine(tempVertices[0].x, tempVertices[0].y, tempVertices[1].x, tempVertices[1].y, pixels);
-	DrawLine(tempVertices[0].x, tempVertices[0].y, tempVertices[2].x, tempVertices[2].y, pixels);
-	DrawLine(tempVertices[3].x, tempVertices[3].y, tempVertices[1].x, tempVertices[1].y, pixels); 
-	DrawLine(tempVertices[3].x, tempVertices[3].y, tempVertices[2].x, tempVertices[2].y, pixels);
+	DrawLine(tempVertices[0].x, tempVertices[0].y, tempVertices[1].x, tempVertices[1].y, pixels, 0, 0, 1);
+	DrawLine(tempVertices[0].x, tempVertices[0].y, tempVertices[2].x, tempVertices[2].y, pixels, 0, 0, 1);
+	DrawLine(tempVertices[3].x, tempVertices[3].y, tempVertices[1].x, tempVertices[1].y, pixels, 0, 0, 1);
+	DrawLine(tempVertices[3].x, tempVertices[3].y, tempVertices[2].x, tempVertices[2].y, pixels, 0, 0, 1);
 
-	DrawLine(tempVertices[4].x, tempVertices[4].y, tempVertices[5].x, tempVertices[5].y, pixels); // red
-	DrawLine(tempVertices[4].x, tempVertices[4].y, tempVertices[6].x, tempVertices[6].y, pixels); // green
-	DrawLine(tempVertices[7].x, tempVertices[7].y, tempVertices[5].x, tempVertices[5].y, pixels); // blue
-	DrawLine(tempVertices[7].x, tempVertices[7].y, tempVertices[6].x, tempVertices[6].y, pixels);
+	DrawLine(tempVertices[4].x, tempVertices[4].y, tempVertices[5].x, tempVertices[5].y, pixels, 0, 0, 1); // red
+	DrawLine(tempVertices[4].x, tempVertices[4].y, tempVertices[6].x, tempVertices[6].y, pixels, 0, 0, 1); // green
+	DrawLine(tempVertices[7].x, tempVertices[7].y, tempVertices[5].x, tempVertices[5].y, pixels, 0, 0, 1); // blue
+	DrawLine(tempVertices[7].x, tempVertices[7].y, tempVertices[6].x, tempVertices[6].y, pixels, 0, 0, 1);
 
-	DrawLine(tempVertices[0].x, tempVertices[0].y, tempVertices[4].x, tempVertices[4].y, pixels);
-	DrawLine(tempVertices[1].x, tempVertices[1].y, tempVertices[5].x, tempVertices[5].y, pixels);
-	DrawLine(tempVertices[2].x, tempVertices[2].y, tempVertices[6].x, tempVertices[6].y, pixels);
-	DrawLine(tempVertices[3].x, tempVertices[3].y, tempVertices[7].x, tempVertices[7].y, pixels);
+	DrawLine(tempVertices[0].x, tempVertices[0].y, tempVertices[4].x, tempVertices[4].y, pixels, 0, 0, 1);
+	DrawLine(tempVertices[1].x, tempVertices[1].y, tempVertices[5].x, tempVertices[5].y, pixels, 0, 0, 1);
+	DrawLine(tempVertices[2].x, tempVertices[2].y, tempVertices[6].x, tempVertices[6].y, pixels, 0, 0, 1);
+	DrawLine(tempVertices[3].x, tempVertices[3].y, tempVertices[7].x, tempVertices[7].y, pixels, 0, 0, 1);
 
 	setPixels(pixels, steps);
 }
@@ -359,7 +390,7 @@ vec4 Renderer::applyTrasformations(const vec3& p, const mat4& mTransform, const 
 	return homog;
 
 }
-void Renderer::setPixels(vector<Pixel> pixels, pair<int, int> steps) const
+void Renderer::setPixels(vector<Pixel> pixels, pair<int, int> steps ) const
 {
 	for (Pixel p : pixels) {
 		p.setCordinates(p.X() + steps.first, p.Y() + steps.second);

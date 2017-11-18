@@ -36,12 +36,14 @@ public:
 	void loadOBJModel(string fileName);
 	void draw();
 	void drawDemo();
+
 	void addCamera(CameraType type, float left = -1.0, float right = 1.0, float bottom = -1.0, float top = 1.0, float zNear = -1.0, float zFar = 1.0);
 	void addFovyAspectCamera(float fovy = 30.0, float aspect = 1.0, float zNear = 1.0, float zFar = 100.0);
 	void setCameraParams(float left, float right, float bottom, float top, float zNear, float zFar);
 	void setCameraFovyAspect(float fovy, float aspect, float zNear, float zFar);
 	void cameraTranslate(float x, float y, float z);
-	void cameraRotate(float x, float y, float z);
+	void cameraRotate(float angleX, float angleY, float angleZ);
+
 	void addPrimitive(PrimitiveModelType type, float size = 1.0);
 
 	void scaleModel(float x, float y, float z); // scale active model
@@ -59,10 +61,12 @@ public:
 	void rotateWorldYaxis(float angle);
 	void rotateWorldZaxis(float angle);
 
-	void rotateCameraXaxis(float angle);
-	void rotateCameraYaxis(float angle);
-	void rotateCameraZaxis(float angle);
+	void zoom(float step);
 
+	void renderCamera();
+
+	void lookAtActiveModel();
+	
 
 	void switchBoundingBox();
 	void switchVertexNormals();

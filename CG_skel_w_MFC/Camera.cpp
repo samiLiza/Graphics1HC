@@ -17,12 +17,16 @@ void Camera::setParamsAux(const float left, const float right,
 }
 
 void Camera::LookAt(const vec4& eye, const vec4& at, const vec4& up)
-{
-	if ((eye == at) || (up == vec4()))
+{	
+	vec4 zero = vec4(0.0000001);
+	if ((eye - at < zero) || (up < zero))
 	{
 		cout << "LookAt : Invalid vector" << endl;
-		return ;
+		return;
 	}
+	
+	this->cameraPosition = eye;
+	this->up = up;
 	vec4 n = normalize(eye - at);
 	vec4 u = normalize(cross(up, n));
 	vec4 v = normalize(cross(n, u));
@@ -32,6 +36,7 @@ void Camera::LookAt(const vec4& eye, const vec4& at, const vec4& up)
 
 }
 
+
 void Camera::reshape(float wRatio, float hRatio)
 {
 	float left = cParams[LEFT] * wRatio;
@@ -39,6 +44,16 @@ void Camera::reshape(float wRatio, float hRatio)
 	float bottom = cParams[BOTTOM] * hRatio;
 	float top = cParams[TOP] * hRatio;
 	setCameraParams(left, right, bottom, top, cParams[zNEAR], cParams[zFAR]);
+}
+
+void Camera::switchRenderIt()
+{
+	renderIt = !renderIt;
+}
+
+bool Camera::getRenderIt()
+{
+	return renderIt;
 }
 
 void Camera::addTransformation(const mat4& transform)

@@ -12,9 +12,8 @@
 using namespace std;
 class Renderer
 {
-	float *m_outBuffer; // 3*width*height
-	float *m_zbuffer; // width*height
 	int m_width, m_height;
+	float *m_zbuffer; // width*height
 
 	/*
 	mat4 mTransform;
@@ -22,7 +21,6 @@ class Renderer
 	mat4 cTransform;
 	mat4 projection;
 	*/
-	void CreateBuffers(int width, int height);
 	void CreateLocalBuffer();
 
 	//////////////////////////////
@@ -43,7 +41,9 @@ public:
 	}
 	//void DrawTriangles(const vector<vec3>* vertices, const mat4& mTransform, const mat4& wTransform, const mat4& cTransform, const mat4& projection, const vector<vec3>* normals=NULL) const;
 	void DrawTriangles(const vector<vec3>* vertices, const mat4& mTransform, const mat4& wTransform, const mat4& cTransform, const mat4& projection, bool showFaceNormals, const mat3& nTransform,
-		const vector<vec3>* vertexNormals = NULL, const vector<vec3>* faceNormals = NULL, pair<int, int> steps = make_pair(0, 0)) const;
+		bool active, const vector<vec3>* vertexNormals = NULL, const vector<vec3>* faceNormals = NULL, pair<int, int> steps = make_pair(0, 0)) const;
+
+	void DrawCamera(const vec4& cameraPosition, const mat4 & cTransform, const mat4 & activeCTransform, const mat4 & projection);
 	
 	void SwapBuffers();
 	void ClearColorBuffer();
@@ -62,6 +62,8 @@ public:
 	void viewPort(vec4& p) const;
 	void viewPort(vec3& p) const;
 	vec4 applyTrasformations(const vec3& p, const mat4& mTransform, const mat4& wTransform, const mat4& cTransform, const mat4& projection) const;
-	void setPixels(vector<Pixel> pixels, pair<int, int> steps) const;
+	void setPixels(vector<Pixel> pixels, pair<int, int> steps = make_pair(0, 0)) const;
 
+	void CreateBuffers(int width, int height);
+	float *m_outBuffer; // 3*width*height
 };

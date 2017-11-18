@@ -20,6 +20,10 @@ protected :
 	vector<vec3> vertex_positions;
 	vector<vec3> vertexNormalPositions;
 	vector<vec3> normalFaces;
+	
+	vec3 modelFramePosition;
+	vec3 worldFramePosition;
+
 	//add more attributes
 	mat4 _worldTransform;
 	mat4 _modelTransform;
@@ -30,9 +34,8 @@ protected :
 	bool showFaceNormals;
 	bool showVertexNormals;
 
-	pair<int, int> steps;
-
 public:
+	pair<int, int> steps;
 
 	MeshModel(string fileName) : boundingBox(NULL), showBox(false), showFaceNormals(false), showVertexNormals(false), steps(make_pair(0,0))
 	{
@@ -40,7 +43,7 @@ public:
 	}
 	~MeshModel(void) {}
 	void loadFile(string fileName);
-	void virtual draw(const Renderer& rend, const mat4& cTransform, const mat4& projection );
+	void virtual draw(const Renderer& rend, const mat4& cTransform, const mat4& projection, bool active );
 	
 	MeshModel* boundingBox;
 
@@ -49,6 +52,7 @@ public:
 	void addNormalWorldTransform(const mat3& transform);
 	void addModelTransform(const mat4& transform);
 	void addSteps(int xr, int yr);
+	void clearSteps();
 
 	void switchBoundingBox();
 	void switchFaceNormals();
@@ -64,6 +68,12 @@ public:
 
 	float getZmax() const;
 	float getZmin() const;
+	
+	void setModelFramePosition(const vec3& newPosition);
+	void setWorldFramePosition(const vec3& newPosition);
+
+	vec3 getModelFramePosition() const;
+	vec3 getWorldFramePosition() const;
 
 	mat4 getModelTransform() const;
 	mat4 getWorldTransform() const;
@@ -92,7 +102,7 @@ public:
 
 	Cube(const vector<vec3>* vertices);
 
-	void virtual draw(const Renderer& rend, const mat4& cTransform, const mat4& projection) override;
+	void virtual draw(const Renderer& rend, const mat4& cTransform, const mat4& projection, bool active) override;
 
 };
 

@@ -60,6 +60,8 @@ vec2 vec2fFromStream(std::istream & aStream)
 	return vec2(x, y);
 }
 
+
+
 void MeshModel::loadFile(string fileName)
 {
 	ifstream ifile(fileName.c_str());
@@ -116,7 +118,6 @@ void MeshModel::loadFile(string fileName)
 			vertex_positions.push_back(vertices[it->v[i] - 1]); /*BUG?*/
 			triangle.push_back(vertices[it->v[i] - 1]); // triangle vertices
 			if (!(vertexNormals.empty())) {
-				vertexNormalPositions.push_back(vertices[it->v[i] - 1]);
 				vertexNormalPositions.push_back(vertexNormals[it->vn[i] - 1]);
 			}
 		}
@@ -178,7 +179,7 @@ void MeshModel::initBoundingBox()
 }
 
 
-void MeshModel::draw(const Renderer& rend, const mat4& cTransform, const mat4& projection)
+void MeshModel::draw(const Renderer& rend, const mat4& cTransform, const mat4& projection, bool active)
 {
 	// ToDo: think about normal
 	mat3 normalTransform;
@@ -194,22 +195,22 @@ void MeshModel::draw(const Renderer& rend, const mat4& cTransform, const mat4& p
 	if (showFaceNormals && showVertexNormals)
 	{
 		normalTransform = _normalWorldTransform * _normalObjectTransform;
-		rend.DrawTriangles(&vertex_positions, _modelTransform, _worldTransform, cTransform, projection, showFaceNormals, normalTransform, &vertexNormalPositions, &normalFaces, steps);
+		rend.DrawTriangles(&vertex_positions, _modelTransform, _worldTransform, cTransform, projection, showFaceNormals, normalTransform, active, &vertexNormalPositions, &normalFaces, steps);
 	}
 	else if (showFaceNormals)
 	{
 		normalTransform = _normalWorldTransform * _normalObjectTransform;
-		rend.DrawTriangles(&vertex_positions, _modelTransform, _worldTransform, cTransform, projection, showFaceNormals, normalTransform, NULL, &normalFaces, steps);
+		rend.DrawTriangles(&vertex_positions, _modelTransform, _worldTransform, cTransform, projection, showFaceNormals, normalTransform, active, NULL, &normalFaces, steps);
 	}
 	else if (showVertexNormals)
 	{
 		normalTransform = _normalWorldTransform * _normalObjectTransform;
-		rend.DrawTriangles(&vertex_positions, _modelTransform, _worldTransform, cTransform, projection, showFaceNormals, normalTransform, &vertexNormalPositions, NULL, steps);
+		rend.DrawTriangles(&vertex_positions, _modelTransform, _worldTransform, cTransform, projection, showFaceNormals, normalTransform, active, &vertexNormalPositions, NULL, steps);
 	}
 	else
 	{
 		normalTransform = _normalWorldTransform * _normalObjectTransform;
-		rend.DrawTriangles(&vertex_positions, _modelTransform, _worldTransform, cTransform, projection, showFaceNormals, normalTransform, NULL, NULL, steps);
+		rend.DrawTriangles(&vertex_positions, _modelTransform, _worldTransform, cTransform, projection, showFaceNormals, normalTransform, active, NULL, NULL, steps);
 	}
 
 }
@@ -238,6 +239,12 @@ void MeshModel::addSteps(int xr, int yr)
 {
 	steps.first += xr;
 	steps.second += yr;
+}
+
+void MeshModel::clearSteps()
+{
+	steps.first = 0;
+	steps.second = 0;
 }
 
 mat4 MeshModel::getModelTransform() const
@@ -324,6 +331,26 @@ float MeshModel::getZmin()const
 }
 
 
+void MeshModel::setModelFramePosition(const vec3 & newPosition)
+{
+	modelFramePosition += newPosition;
+}
+
+void MeshModel::setWorldFramePosition(const vec3 & newPosition)
+{
+	worldFramePosition += newPosition;
+}
+
+vec3 MeshModel::getModelFramePosition() const
+{
+	return vec3(modelFramePosition);
+}
+
+vec3 MeshModel::getWorldFramePosition() const
+{
+	return vec3(worldFramePosition);
+}
+
 PrimitiveCube::PrimitiveCube(float size)
 {
 	vector<vec3> vertices;
@@ -332,28 +359,29 @@ PrimitiveCube::PrimitiveCube(float size)
 	vector<vec3> triangle;
 	vector<FaceIdcs> faces;
 
-	/*1*/vertices.push_back(size * vec3(0.0, 0.0, 0.0));
-	/*2*/vertices.push_back(size * vec3(0.0, 0.0, 1.0));
-	/*3*/vertices.push_back(size * vec3(0.0, 1.0, 0.0));
-	/*4*/vertices.push_back(size * vec3(0.0, 1.0, 1.0));
+	/*1*/vertices.push_back(size * vec3(-0.5, -0.5, 0.5));
+	/*2*/vertices.push_back(size * vec3(0.5, -0.5, 0.5));
+	/*3*/vertices.push_back(size * vec3(-0.5, 0.5, 0.5));
+	/*4*/vertices.push_back(size * vec3(0.5, 0.5, 0.5));
 
-	/*5*/vertices.push_back(size * vec3(1.0, 0.0, 0.0));
-	/*6*/vertices.push_back(size * vec3(1.0, 0.0, 1.0));
-	/*7*/vertices.push_back(size * vec3(1.0, 1.0, 0.0));
-	/*8*/vertices.push_back(size * vec3(1.0, 1.0, 1.0));
+	/*5*/vertices.push_back(size * vec3(-0.5, 0.5, -0.5));
+	/*6*/vertices.push_back(size * vec3(0.5, 0.5, -0.5));
+	/*7*/vertices.push_back(size * vec3(-0.5, -0.5, -0.5));
+	/*8*/vertices.push_back(size * vec3(0.5, -0.5, -0.5));
 
-	faces.push_back(FaceIdcs(istringstream("1 7 5")));
-	faces.push_back(FaceIdcs(istringstream("1 3 7")));
-	faces.push_back(FaceIdcs(istringstream("1 4 3")));
-	faces.push_back(FaceIdcs(istringstream("1 2 4")));
-	faces.push_back(FaceIdcs(istringstream("3 8 7")));
-	faces.push_back(FaceIdcs(istringstream("3 4 8")));
-	faces.push_back(FaceIdcs(istringstream("5 7 8")));
-	faces.push_back(FaceIdcs(istringstream("5 8 6")));
-	faces.push_back(FaceIdcs(istringstream("1 5 6")));
-	faces.push_back(FaceIdcs(istringstream("1 6 2")));
-	faces.push_back(FaceIdcs(istringstream("2 6 8")));
+
+	faces.push_back(FaceIdcs(istringstream("1 2 3")));
+	faces.push_back(FaceIdcs(istringstream("3 2 4")));
+	faces.push_back(FaceIdcs(istringstream("3 4 5")));
+	faces.push_back(FaceIdcs(istringstream("5 4 6")));
+	faces.push_back(FaceIdcs(istringstream("5 6 7")));
+	faces.push_back(FaceIdcs(istringstream("7 6 8")));
+	faces.push_back(FaceIdcs(istringstream("7 8 1")));
+	faces.push_back(FaceIdcs(istringstream("1 8 2")));
 	faces.push_back(FaceIdcs(istringstream("2 8 4")));
+	faces.push_back(FaceIdcs(istringstream("4 8 6")));
+	faces.push_back(FaceIdcs(istringstream("7 1 5")));
+	faces.push_back(FaceIdcs(istringstream("5 1 3")));
 
 	for (vector<FaceIdcs>::iterator it = faces.begin(); it != faces.end(); ++it)
 	{
