@@ -148,6 +148,22 @@ void Scene::reshape(int width, int height)
 	}
 }
 
+void Scene::switchActiveModel()
+{
+	if (activeModel >= 0)
+	{
+		activeModel = (activeModel + 1) % models.size();
+	}
+}
+
+void Scene::switchActiveCamera()
+{
+	if (activeCamera >= 0)
+	{
+		activeCamera = (activeCamera + 1) % cameras.size();
+	}
+}
+
 void Scene::addPrimitive(PrimitiveModelType type, float size)
 {
 	// fix if new primitives added

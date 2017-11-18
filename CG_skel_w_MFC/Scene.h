@@ -74,4 +74,7 @@ public:
 
 	void setActiveModel(int modelIdx);
 	void reshape(int width, int height);
+
+	void switchActiveModel();
+	void switchActiveCamera();
 };

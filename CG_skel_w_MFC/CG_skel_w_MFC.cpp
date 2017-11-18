@@ -88,6 +88,18 @@ void keyboard( unsigned char key, int x, int y )
 		exit( EXIT_SUCCESS );
 		break;
 	}
+
+	if (key == 'm') 
+	{
+		scene->switchActiveModel();
+		scene->draw();
+	}
+
+	if (key == 'c') 
+	{
+		scene->switchActiveCamera();
+		scene->draw();
+	}
 }
 
 void mouse(int button, int state, int x, int y)
