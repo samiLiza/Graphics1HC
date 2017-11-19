@@ -87,8 +87,20 @@ void keyboard( unsigned char key, int x, int y )
 	case 033:
 		exit( EXIT_SUCCESS );
 		break;
-	}
+	case '+':
+		scene->zoom(0.9);
+		break;
+	case '-':
+		scene->zoom(1.1);
+	case 'm':
+		scene->switchActiveModel();
+		break;
+	case 'c':
+		scene->switchActiveCamera();
+		break;
 
+	}
+/*
 	if (key == 'm') 
 	{
 		scene->switchActiveModel();
@@ -97,9 +109,12 @@ void keyboard( unsigned char key, int x, int y )
 
 	if (key == 'c') 
 	{
-		scene->switchActiveCamera();
+		
 		scene->draw();
 	}
+	scene->draw();
+	*/
+	scene->draw();
 }
 
 void mouse(int button, int state, int x, int y)
