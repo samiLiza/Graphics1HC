@@ -78,6 +78,7 @@ void OrthoCamera::setCameraParams(const float left, const float right,
 	setParamsAux(left, right, bottom, top, zNear, zFar);
 	vec3 scaleVec = vec3(2 / (cParams[RIGHT] - cParams[LEFT]), 2 / (cParams[TOP] - cParams[BOTTOM]), 2/(cParams[zNEAR] - cParams[zFAR]));
 	vec3 translateVec = vec3(-(cParams[LEFT] + cParams[RIGHT]) / 2, -(cParams[BOTTOM] + cParams[TOP]) / 2, (cParams[zNEAR] + cParams[zFAR]) / 2);
+	projection = mat4();
 	projection[2][2] = 0;
 	projection = projection * Scale(scaleVec);
 	projection = projection * Translate(translateVec);
